@@ -38,15 +38,6 @@ const Swapping = () => {
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
 
-
-  const getToken1Approval = async () => {
-    getTokenApproval(defaultAccount, tokenAddress1, provider)
-  }
-
-  const getToken2Approval = async () => {
-    getTokenApproval(defaultAccount, tokenAddress2, provider)
-  }
-
   const swapToken = async () => {
     performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
   };
@@ -69,7 +60,6 @@ const Swapping = () => {
 
 
   return (
-    <section className="relative lg:mt-24 lg:pb-24 mt-24 pt-10 pb-24">
       <div className="mt-16 ml-64">
         <h1 className="text-4xl">Swap</h1>
         {defaultAccount && <h3> Address: {defaultAccount} </h3>}
@@ -85,7 +75,7 @@ const Swapping = () => {
                 value={tokenAddress1}
                 onChange={handleToken1AddressChange}
               />
-                        <h1 className="text-left mb-4">Token 1 Swap Amount</h1>
+              <h1 className="text-left mb-4">Token 1 Swap Amount</h1>
               <input
                 className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
                 placeholder="0.0"
@@ -104,7 +94,7 @@ const Swapping = () => {
                 value={tokenAddress2}
                 onChange={handleToken2AddressChange}
               />
-                        <h1 className="text-left mb-4">Token 2 Swap Amount</h1>
+              <h1 className="text-left mb-4">Token 2 Swap Amount</h1>
               <input
                 className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
                 placeholder="0.0"
@@ -131,7 +121,6 @@ const Swapping = () => {
           Swap
         </button>
       </div>
-    </section>
 
   );
 };

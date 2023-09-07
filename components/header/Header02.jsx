@@ -87,22 +87,10 @@ export default function Header02() {
       },
       {
         id: uuidv4(),
-        name: "Swap",
+        name: "LiquiditySwap",
         condition: true,
-        path: "/home/swapping",
+        path: "/home/liquiditySwap",
       },
-      {
-        id: uuidv4(),
-        name: "Add Liquidity",
-        condition: true,
-        path: "/home/AddLiquidity",
-      },
-      {
-        id: uuidv4(),
-        name: "Remove Liquidity",
-        condition: true,
-        path: "/home/RemoveLiquidity",
-      }
     ],
   };
 
