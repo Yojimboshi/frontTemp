@@ -1,9 +1,7 @@
-import { Signer, ethers } from "ethers";
 import SetupSwapPool from "../../components/LiquidityPoolSwap/SetupSwapPool";
 import { useEffect, useState } from "react";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
 import { useAddLiquidity } from "../../hooks/useRouterContract";
-import { Container } from "@mui/material";
 
 const LiquidityPool = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
@@ -11,8 +9,6 @@ const LiquidityPool = () => {
   const [tokenAmount1, setTokenAmount1] = useState("");
   const [tokenAmount2, setTokenAmount2] = useState("");
   const [tokenReserve, setTokenReserve] = useState([]);
-  const [tokenAllowance1, setTokenAllowance1] = useState("");
-  const [tokenAllowance2, setTokenAllowance2] = useState("");
   const [tokenQuote1, setTokenQuote1] = useState(null);
   const [tokenQuote2, setTokenQuote2] = useState(null);
   const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
@@ -84,7 +80,7 @@ const LiquidityPool = () => {
           />
           <div className="mt-4 mb-4">
           </div>
-          <h1>Token Added</h1>
+          <h1>Token 1 amount Added</h1>
           <input
             className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
             placeholder="0.0"
@@ -106,7 +102,7 @@ const LiquidityPool = () => {
           />
           <div className="mt-4 mb-4">
           </div>
-          <h1>Token Added</h1>
+          <h1>Token 2 amount Added</h1>
           <input
             className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
             placeholder="0.0"
@@ -119,11 +115,6 @@ const LiquidityPool = () => {
         <h1>
           Token1 per Token2: {tokenReserve[0] / tokenReserve[1]} Token2 per Token1:{" "}
           {tokenReserve[1] / tokenReserve[0]}
-        </h1>
-      </div>
-      <div>
-        <h1>
-          Token Quote 1: {tokenQuote1} Token Quote 2:{tokenQuote2}
         </h1>
       </div>
       <div>

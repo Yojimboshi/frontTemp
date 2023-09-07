@@ -2,7 +2,9 @@ import { getContract } from "../hooks/useContracts";
 import uniSwapRouter_ABI from "../data/abi/uniswapRouter";
 import { ethers } from "ethers";
 import BigNumber from 'bignumber.js';
-import { getTokenAllowance, getTokenApproval, getTokenSymbol, getTokenDecimal, getUserBalance, getTotalSupply} from "./useTokenContract";
+import { getTokenAllowance, getTokenApproval,
+    getTokenSymbol, getTokenDecimal, getUserBalance, getTotalSupply,
+    getTokenPairforToken0AndToken1,getTokenPairApproval,getTokenPairAllowance} from "./useTokenContract";
 
 const contractAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // uniswapRouterv2
 const Fee = 0.003;
@@ -160,16 +162,23 @@ export async function useRemoveLiquidity(
     userAddress,
     provider,
     tokenReserve){
+        const Token0andToken1 = await getTokenPairforToken0AndToken1(tokenAddress1,tokenAddress2,provider);
         const contract = getContract(contractAddress, uniSwapRouter_ABI, provider, userAddress);
         const totalSupply = await getTotalSupply(tokenAddress1,tokenAddress2,provider);
         let userBalance = await getUserBalance(tokenAddress1,tokenAddress2,provider,userAddress);
-        const liquidity = userBalance * liquidityPrecentage / 100;
+        userBalance = ethers.utils.formatEther(userBalance);
+        let liquidity = userBalance * liquidityPrecentage / 100;
+        
+        checkTokenPairAllowance(tokenAddress1,tokenAddress2,provider,userAddress,liquidity)
         const amountA = liquidity * tokenReserve[0] / totalSupply;
         const amountB = liquidity * tokenReserve[1] / totalSupply;
-        const amountAMin = amountA /100 * 95
-        const amountBMin = amountB /100 * 95
+        let amountAMin = amountA /100 * 95;
+        let amountBMin = amountB /100 * 95;
         const deadline = Math.floor(Date.now() / 1000) + 600;
-        await contract.removeLiquidity(tokenAddress1,tokenAddress2,liquidity,amountAMin,amountBMin,userAddress,deadline);
+        amountAMin = ethers.utils.parseEther(amountAMin.toString());
+        amountBMin = ethers.utils.parseEther(amountBMin.toString())
+        liquidity = ethers.utils.parseEther(liquidity.toString())
+        await contract.removeLiquidity(Token0andToken1.token0,Token0andToken1.token1,liquidity,amountAMin,amountBMin,userAddress,deadline);
 }
 
 function slipCalcV2(_amountIn, _reserveIn, _reserveOut, _deciIn, _deciOut, Fee) {
@@ -230,6 +239,17 @@ async function checkTokenAllowance(tokenAmount, userAddress, tokenAddress, provi
         return;
     }
 };
+
+async function checkTokenPairAllowance(tokenAddress1,tokenAddress2,provider,userAddress,liquidity){
+    const tokenPairAllowance = await getTokenPairAllowance(tokenAddress1,tokenAddress2,provider,userAddress);
+    console.log(liquidity)
+    console.log(tokenPairAllowance)
+    if(liquidity>= tokenPairAllowance){
+        getTokenPairApproval(tokenAddress1,tokenAddress2,provider,userAddress);
+    }else{
+        return;
+    }
+}
 
 function calcAmountToken(amountIn, reserveToken0, reserveToken1) {
     let inputToken0 = amountIn * (10**18);

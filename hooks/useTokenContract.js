@@ -50,11 +50,11 @@ export async function getTokenDecimal(tokenAddress,provider){
 
 export async function getUserBalance(tokenAddress1,tokenAddress2,provider,userAddress){
     const factoryAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+    const spender = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
     const uniFactoryContract = getContract(factoryAddress,UniFactoryABI,provider)
     const liquidityPoolAddress = await uniFactoryContract.getPair(tokenAddress1, tokenAddress2);
     const pairContract = getContract(liquidityPoolAddress,UniPairABI,provider);
     let userBalance = await pairContract.balanceOf(userAddress);
-    // userBalance = ethers.utils.formatEther(userBalance);
     return userBalance;
 }
 
@@ -65,4 +65,44 @@ export async function getTotalSupply(tokenAddress1,tokenAddress2,provider){
     const pairContract = getContract(liquidityPoolAddress,UniPairABI,provider);
     const totalSupply = await pairContract.totalSupply();
     return totalSupply;
+}
+
+export async function getTokenPairforToken0AndToken1(tokenAddress1,tokenAddress2,provider){
+    const factoryAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+    const uniFactoryContract = getContract(factoryAddress,UniFactoryABI,provider)
+    const liquidityPoolAddress = await uniFactoryContract.getPair(tokenAddress1, tokenAddress2);
+    const pairContract = getContract(liquidityPoolAddress,UniPairABI,provider);
+    const token0 = await pairContract.token0();
+    const token1 = await pairContract.token1();
+    return {token0: token0,
+        token1: token1,}
+}
+
+export async function getTokenPairApproval(tokenAddress1,tokenAddress2,provider,userAddress){
+    const spender = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+    const factoryAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+    const uniFactoryContract = getContract(factoryAddress,UniFactoryABI,provider)
+    const liquidityPoolAddress = await uniFactoryContract.getPair(tokenAddress1, tokenAddress2);
+    const pairContract = getContract(liquidityPoolAddress,UniPairABI,provider,userAddress);
+    const spenderBalance =  2^256 -1;
+    try{
+        await pairContract.approve(spender, spenderBalance);
+    }catch(error){
+        console.log(error);
+    }
+}
+
+export async function getTokenPairAllowance(tokenAddress1,tokenAddress2,provider,userAddress){
+    const spender = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+    const factoryAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+    const uniFactoryContract = getContract(factoryAddress,UniFactoryABI,provider)
+    const liquidityPoolAddress = await uniFactoryContract.getPair(tokenAddress1, tokenAddress2);
+    const pairContract = getContract(liquidityPoolAddress,UniPairABI,provider);
+    try{
+        let userTokenAllowance = await pairContract.allowance(userAddress,spender);
+        userTokenAllowance = ethers.utils.formatEther(userTokenAllowance);
+        return userTokenAllowance
+    }catch(error){
+        console.log(error);
+    }
 }

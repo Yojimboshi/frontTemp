@@ -77,7 +77,7 @@ const Swapping = () => {
 
         <div className="flex flex-wrap">
           <div className="dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8 pt-4 pb-4 flex flex-col">
-            <h1 className="text-left mb-4">Token address</h1>
+            <h1 className="text-left mb-4">Token 1 address</h1>
             <div className="flex flex-col">
               <input
                 className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
@@ -85,6 +85,7 @@ const Swapping = () => {
                 value={tokenAddress1}
                 onChange={handleToken1AddressChange}
               />
+                        <h1 className="text-left mb-4">Token 1 Swap Amount</h1>
               <input
                 className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
                 placeholder="0.0"
@@ -95,7 +96,7 @@ const Swapping = () => {
           </div>
 
           <div className="dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8 pt-4 pb-4 flex flex-col">
-            <h1 className="text-left mb-4">Token address</h1>
+            <h1 className="text-left mb-4">Token 2 address</h1>
             <div className="flex flex-col">
               <input
                 className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
@@ -103,6 +104,7 @@ const Swapping = () => {
                 value={tokenAddress2}
                 onChange={handleToken2AddressChange}
               />
+                        <h1 className="text-left mb-4">Token 2 Swap Amount</h1>
               <input
                 className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
                 placeholder="0.0"
