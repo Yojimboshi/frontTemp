@@ -15,7 +15,7 @@ export async function useAddLiquidity(
     userAddress,
     provider,
     tokenReserve
-) {
+) {const Token0andToken1 = await getTokenPairforToken0AndToken1(tokenAddress1,tokenAddress2,provider);
     let amountOutMinToken1 = 0;
     let amountOutMinToken2 = 0;
     const tokenReserve1 = ethers.utils.formatEther(tokenReserve[0])
@@ -42,8 +42,8 @@ export async function useAddLiquidity(
         token2Amount = ethers.utils.parseEther(token2Amount.toString());
         token1Amount = ethers.utils.parseEther(token1Amount.toString());
         await contract.addLiquidity(
-            tokenAddress1,
-            tokenAddress2,
+            Token0andToken1.token0,
+            Token0andToken1.token1,
             token1Amount,
             token2Amount,
             amountOutMinToken1,
@@ -58,8 +58,8 @@ export async function useAddLiquidity(
         token2Amount = ethers.utils.parseEther(token2Amount.toString());
         token1Amount = ethers.utils.parseEther(token1Amount.toString());
         await contract.addLiquidity(
-            tokenAddress1,
-            tokenAddress2,
+            Token0andToken1.token0,
+            Token0andToken1.token1,
             token1Amount,
             token2Amount,
             amountOutMinToken1,
@@ -80,6 +80,7 @@ export async function performTrade(
     provider,
     tokenReserve
 ) {
+    const Token0andToken1 = await getTokenPairforToken0AndToken1(tokenAddress1,tokenAddress2,provider);
     checkTokenAllowance(amountIn, userAddress, tokenInAddress, provider);
     const tokenReserve1 = ethers.utils.formatEther(tokenReserve[0])
     const tokenReserve2 = ethers.utils.formatEther(tokenReserve[1])
@@ -124,7 +125,7 @@ export async function performTrade(
         await contract.swapExactTokensForETH(
             amountIn,
             amountOutMin,
-            [tokenInAddress, tokenOutAddress],
+            [Token0andToken1.token0, Token0andToken1.token1],
             userAddress,
             deadline
         )
@@ -132,7 +133,7 @@ export async function performTrade(
         await contract.swapExactETHForTokens(
             amountIn,
             amountOutMin,
-            [tokenInAddress, tokenOutAddress],
+            [Token0andToken1.token0, Token0andToken1.token1],
             userAddress,
             deadline
         );
@@ -140,7 +141,7 @@ export async function performTrade(
         await contract.swapExactTokensForTokens(
             amountIn,
             amountOutMin,
-            [tokenInAddress, tokenOutAddress],
+            [Token0andToken1.token0, Token0andToken1.token1],
             userAddress,
             deadline
         );
