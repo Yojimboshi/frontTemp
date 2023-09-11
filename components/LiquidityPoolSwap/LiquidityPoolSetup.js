@@ -53,7 +53,7 @@ export const setupLiquidityPool = async (args) => {
   }
   function customRound(number) {
     number = parseFloat(number);
-    number = number.toFixed(6);
+    number = number.toFixed(2);
     return number;
   }
 };

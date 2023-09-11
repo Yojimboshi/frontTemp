@@ -56,7 +56,9 @@ const LiquidityPool = () => {
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
   async function AddLiquidity() {
+    if(!isNaN(tokenAmount1)){
     useAddLiquidity(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve)
+    }
   }
 
 
@@ -108,15 +110,17 @@ const LiquidityPool = () => {
 
   const handleToken1AmountChange = async (event) => {
     setTokenAmount1(event.target.value);
-    if (tokenPairState != true) {
+    if (tokenPairState == false) {
+      console.log(tokenPairState)
       setButtonText("Insert Token Pair")
     } else {
+      setTimeout(() => 5000 );
       setButtonText("Enter Liquidity Amount")
     }
 
     if (tokenAmount1 != "") {
       setButtonDisabled(false)
-      const tokenAllowance = await getTokenAllowance(tokenAmount1, tokenAddress1, provider);
+      const tokenAllowance = await getTokenAllowance(defaultAccount, tokenAddress1, provider);
       if (tokenAmount1 >= tokenAllowance) {
         setButtonText('Approve')
       } else {
@@ -196,8 +200,8 @@ const LiquidityPool = () => {
       </div>
       <div>
         {tokenReserve && <h1>
-          {tokenSymbol1} per {tokenSymbol2}: {tokenReserve[0] / tokenReserve[1]} {tokenSymbol2} per {tokenSymbol1}:{" "}
-          {tokenReserve[1] / tokenReserve[0]}
+          {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
+          {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
         </h1>}
       </div>
       <div>

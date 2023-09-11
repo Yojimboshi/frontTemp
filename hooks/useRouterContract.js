@@ -83,7 +83,6 @@ export async function performTrade(
 	provider,
 	tokenReserve
 ) {
-	const Token0andToken1 = await getTokenPairforToken0AndToken1(tokenInAddress, tokenOutAddress, provider);
 	checkTokenAllowance(amountIn, userAddress, tokenInAddress, provider);
 	const tokenReserve1 = ethers.utils.formatEther(tokenReserve[0])
 	const tokenReserve2 = ethers.utils.formatEther(tokenReserve[1])
@@ -98,7 +97,7 @@ export async function performTrade(
 	const slippage = slipCalcV2(amountIn, tokenReserve1, tokenReserve2, tokenDecimal1, tokenDecimal2, Fee)
 	const expectedPrice = getAmountOutV2(amountIn, tokenReserve1, tokenReserve2, tokenDecimal1, tokenDecimal2, Fee);
 	const slippagePercentage = slippage / expectedPrice * 100;
-
+	console.log(slippagePercentage);
 	let amountOutMin = expectedPrice * 0.01;
 	amountOutMin = parseFloat(amountOutMin).toFixed(6);
 	amountOutMin = ethers.utils.parseEther(amountOutMin.toString());
@@ -106,7 +105,7 @@ export async function performTrade(
 
 	const contract = getContract(contractAddress, uniSwapRouter_ABI, provider, userAddress);
 	const deadline = Math.floor(Date.now() / 1000) + 600; // 10 minute from the swap
-
+	console.log(deadline)
 	switch (chainID) {
 		case 1: // Etheruem net
 			nativeToken = "ETH";
@@ -130,7 +129,7 @@ export async function performTrade(
 			await contract.swapExactTokensForETH(
 				amountIn,
 				amountOutMin,
-				[Token0andToken1.token0, Token0andToken1.token1],
+				[tokenInAddress, "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"],
 				userAddress,
 				deadline
 			)
@@ -138,7 +137,7 @@ export async function performTrade(
 			await contract.swapExactETHForTokens(
 				amountIn,
 				amountOutMin,
-				[Token0andToken1.token0, Token0andToken1.token1],
+				["0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6", tokenOutAddress],
 				userAddress,
 				deadline
 			);
@@ -146,7 +145,7 @@ export async function performTrade(
 			await contract.swapExactTokensForTokens(
 				amountIn,
 				amountOutMin,
-				[Token0andToken1.token0, Token0andToken1.token1],
+				[tokenInAddress, tokenOutAddress],
 				userAddress,
 				deadline
 			);

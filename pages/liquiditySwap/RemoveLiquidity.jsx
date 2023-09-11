@@ -11,6 +11,8 @@ const LiquidityPool = () => {
   const [tokenReserve, setTokenReserve] = useState([]);
   const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
   const [prevTokenAmount2, setPrevTokenAmount2] = useState("");
+  const [tokenQuote1, setTokenQuote1] = useState(null);
+  const [tokenQuote2, setTokenQuote2] = useState(null);
   const [tokenApproved, setTokenApproved] = useState(true);
   const [tokenPairState, setTokenPairState] = useState(false);
   const [buttonText, setButtonText] = useState('Insert Token Pair');
@@ -30,6 +32,8 @@ const LiquidityPool = () => {
       prevTokenAmount1,
       prevTokenAmount2,
       setTokenReserve,
+      setTokenQuote1,
+      setTokenQuote2,
       setPrevTokenAmount1,
       setPrevTokenAmount2
     });
@@ -38,7 +42,9 @@ const LiquidityPool = () => {
   }, [tokenAddress1, tokenAddress2]);
 
   async function RemoveLiquidity() {
+    if(!isNaN(tokenAmount1)){
     useRemoveLiquidity(tokenAddress1, tokenAddress2, liquidityPercentage, defaultAccount, provider, tokenReserve)
+    }
   }
 
   async function getTokenSymbols() {
@@ -106,9 +112,9 @@ const LiquidityPool = () => {
       </div>
       <div>
         <h1>
-        {tokenReserve &&<h1>
-          {tokenSymbol1} per {tokenSymbol2}: {tokenReserve[0] / tokenReserve[1]} {tokenSymbol2} per {tokenSymbol1}:{" "}
-          {tokenReserve[1] / tokenReserve[0]}
+        {tokenReserve && <h1>
+          {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
+          {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
         </h1>}
         </h1>
       </div>

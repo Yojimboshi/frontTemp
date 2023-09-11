@@ -74,7 +74,10 @@ const Swapping = () => {
   {/*<---- Interface Handler ----> */ }
 
   const swapToken = async () => {
-    performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
+    if(!isNaN(tokenAmount1)){
+      performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
+    }
+    
   };
 
   const handleToken1AddressChange = (event) => {
@@ -154,9 +157,9 @@ const Swapping = () => {
 
       </div>
       <div>
-        {tokenReserve && <h1>
-          {tokenSymbol1} per {tokenSymbol2}: {tokenReserve[0] / tokenReserve[1]} {tokenSymbol2} per {tokenSymbol1}:{" "}
-          {tokenReserve[1] / tokenReserve[0]}
+      {tokenReserve && <h1>
+          {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
+          {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
         </h1>}
       </div>
       <button className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
