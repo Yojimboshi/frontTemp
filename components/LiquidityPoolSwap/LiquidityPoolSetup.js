@@ -2,19 +2,25 @@
 import { getContract } from "../../hooks/useContracts";
 import { ethers } from "ethers";
 import UniPairABI from "../../data/abi/uniswapPair.json";
+import UniFactoryABI from "../../data/abi/uniswapFactory.json";
+import uniSwapRouter_ABI from "../../data/abi/uniswapRouter";
+import { etherRouterContract, etherFactoryContract } from "../../config/setting";
+
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const setupLiquidityPool = async (args) => {
   const {
     tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2,
-    provider, uniFactoryContract, uniRouterContract,
-    tokenReserve, prevTokenAmount1, prevTokenAmount2,
+    provider, tokenReserve, prevTokenAmount1, prevTokenAmount2,
     setTokenReserve, setTokenQuote1, setTokenQuote2,
     setPrevTokenAmount1, setPrevTokenAmount2
   } = args;
 
 
+  const uniFactoryContract = getContract(etherFactoryContract, UniFactoryABI, provider)
+  const uniRouterContract = getContract(etherRouterContract, uniSwapRouter_ABI, provider);
   if (tokenAddress1 && tokenAddress2) {
+
     const liquidityPoolAddress = await uniFactoryContract.getPair(tokenAddress1, tokenAddress2);
     if (liquidityPoolAddress && liquidityPoolAddress !== ZERO_ADDRESS) {
       const LiquidityPoolContract = getContract(liquidityPoolAddress, UniPairABI, provider);

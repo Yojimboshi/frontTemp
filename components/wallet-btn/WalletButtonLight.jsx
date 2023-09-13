@@ -10,8 +10,15 @@ export default function WalletButtonLight() {
   const [defaultAccount, setDefaultAccount] = useState(null);
 
   const connectWalletHandler = async () => {
-    if (window.ethereum && !defaultAccount) {
-      try {
+    connect();
+    try {
+      if (window.ethereum && !defaultAccount) {
+        window.ethereum
+          .request({ method: 'eth_requestAccounts' })
+          .catch(error => {
+            console.error('Error Connecting to MetaMask: ', error);
+          })
+
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setDefaultAccount(accounts[0]);
         localStorage.setItem('defaultAccount', accounts[0]);
@@ -22,17 +29,28 @@ export default function WalletButtonLight() {
         const [integerPart, decimalPart] = balanceInEther.split('.');
         const formattedBalance = `${integerPart}.${decimalPart.substring(0, 6)}....`;
         localStorage.setItem('accountBalance', formattedBalance);
-      } catch (error) {
-        console.error("Error connecting to wallet:", error);
-      }
-    } else if (!window.ethereum) {
+
+      } else if (!window.ethereum) {
         console.log('Need to install MetaMask');
+      }
+    } catch (error) {
+      console.error("Error connecting to wallet:", error);
+    }
+
+    try {
+      window.ethereum.on('accountsChanged', accounts => {
+        setDefaultAccount(accounts[0]);
+      });
+    } catch (e) {
+      console.error("Error setting up event listener for account change:", e);
     }
   };
 
+
+
   const renderButton = (onClickHandler, iconPath) => (
     <button
-      onClick={onClickHandler}
+      onClick={connectWalletHandler}
       className="js-wallet border-jacarta-100 focus:bg-accent group hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border bg-white transition-colors hover:border-transparent focus:border-transparent border-transparent bg-white/[.15]"
     >
       <svg
@@ -56,7 +74,7 @@ export default function WalletButtonLight() {
 
   switch (status) {
     case "initializing":
-      return <div>Ongoing...</div>;
+      return renderButton(connectWalletHandler, iconPath);
     case "unavailable":
       return renderButton(() => dispatch(walletModalShow()), iconPath);
     case "notConnected":
@@ -64,6 +82,7 @@ export default function WalletButtonLight() {
     case "connecting":
       return <div>Connecting...</div>;
     default:
+      console.log(status);
       return null;
   }
 }

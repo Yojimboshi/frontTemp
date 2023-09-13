@@ -22,6 +22,7 @@ const Swapping = () => {
   const [tokenSymbol2, setTokenSymbol2] = useState("");
   const [token1Balance, setToken1Balance] = useState("");
   const [token2Balance, setToken2Balance] = useState("");
+  const [selectedOption, setSelectedOption] = useState('');
   const { provider, uniFactoryContract, uniRouterContract, defaultAccount } = SetupSwapPool();
 
 
@@ -43,8 +44,11 @@ const Swapping = () => {
       setPrevTokenAmount1,
       setPrevTokenAmount2
     });
-    getTokenSymbols();
-    getTokenBalances();
+    if(tokenAddress1 != "" && tokenAddress2 != ""){
+      getTokenSymbols();
+      getTokenBalances();
+    }
+
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
 
@@ -69,7 +73,6 @@ const Swapping = () => {
       console.log(error)
     }
   }
-
 
   {/*<---- Interface Handler ----> */ }
 
@@ -96,6 +99,9 @@ const Swapping = () => {
     setTokenAmount2(event.target.value);
   };
 
+  const handleOptionChange = (event) => {
+    setSelectedOption(event.target.value);
+  };
 
   return (
     <div className="mt-16 ml-64">
@@ -104,9 +110,20 @@ const Swapping = () => {
 
       <div className="flex flex-wrap">
         <div className="dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8 pt-4 pb-4 flex flex-col">
-          <h1 className="text-left mb-4">
-            {tokenSymbol1 ? `${tokenSymbol1} address` : "Token 1 Address"}
-          </h1>
+        <div className="flex">
+            <h1 className=" mr-2 flex-grow">
+              {tokenSymbol1 ? `${tokenSymbol1} address` : "Token 1 Address"}
+            </h1>
+            <select
+              value={selectedOption}
+              onChange={handleOptionChange}
+            >
+              <option value="">Select an Option</option>
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+            </select>
+          </div>
           <div className="flex flex-col">
             <input
               className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"
@@ -130,9 +147,20 @@ const Swapping = () => {
         </div>
 
         <div className="dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8 pt-4 pb-4 flex flex-col">
-          <h1 className="text-left mb-4">
-            {tokenSymbol2 ? `${tokenSymbol2} address` : "Token 2 Address"}
-          </h1>
+        <div className="flex">
+            <h1 className=" mr-2 flex-grow">
+              {tokenSymbol2 ? `${tokenSymbol2} address` : "Token 2 Address"}
+            </h1>
+            <select
+              value={selectedOption}
+              onChange={handleOptionChange}
+            >
+              <option value="">Select an Option</option>
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+            </select>
+          </div>
           <div className="flex flex-col">
             <input
               className="w-1/4 border border-solid dark:border-jacarta-600 border-gray-300 mb-3 rounded-full py-3 px-8 w-full m-3"

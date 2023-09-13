@@ -18,9 +18,9 @@ const SetupSwapPool = () => {
       try {
         if (window.ethereum) {
           window.ethereum
-            .request({method: 'eth_requestAccounts'})
-            .catch(error=>{
-              console.error('Error Connecting to MetaMask: ',error);
+            .request({ method: 'eth_requestAccounts' })
+            .catch(error => {
+              console.error('Error Connecting to MetaMask: ', error);
             })
           const accounts = await window.ethereum.request({ method: 'eth_accounts' });
           setDefaultAccount(accounts[0]);
@@ -39,7 +39,7 @@ const SetupSwapPool = () => {
       } catch (error) {
         console.error("Error during setup in useConfigurationSwapPool:", error);
       }
-      
+
       try {
         window.ethereum.on('accountsChanged', accounts => {
           setDefaultAccount(accounts[0]);
