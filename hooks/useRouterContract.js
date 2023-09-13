@@ -7,8 +7,8 @@ import {
 	getTokenSymbol, getTokenDecimal, getUserBalance, getTotalSupply,
 	getTokenPairforToken0AndToken1, getTokenPairApproval, getTokenPairAllowance
 } from "./useTokenContract";
+import { etherRouterContract, etherFactoryContract, binanceFactoryContract, binanceRouterContract } from "../config/setting";
 
-const contractAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // uniswapRouterv2
 const Fee = 0.003;
 export async function useAddLiquidity(
 	tokenAddress1,
@@ -18,13 +18,18 @@ export async function useAddLiquidity(
 	provider,
 	tokenReserve
 ) {
+	const contractAddress = await blockChainServer(provider);
 	const Token0andToken1 = await getTokenPairforToken0AndToken1(tokenAddress1, tokenAddress2, provider);
 	let amountOutMinToken1 = 0;
 	let amountOutMinToken2 = 0;
-	const tokenReserve1 = ethers.utils.formatEther(tokenReserve[0])
-	const tokenReserve2 = ethers.utils.formatEther(tokenReserve[1])
+	console.log(tokenReserve);
+	if(tokenReserve != ""){
+		const tokenReserve1 = ethers.utils.formatEther(tokenReserve[0])
+		const tokenReserve2 = ethers.utils.formatEther(tokenReserve[1])
+	}
+
 	checkTokenAllowance(token1Amount, userAddress, tokenAddress1, provider);
-	const contract = getContract(contractAddress, uniSwapRouter_ABI, provider, userAddress);
+	const contract = getContract(contractAddress.routerAddress, uniSwapRouter_ABI, provider, userAddress);
 	const deadline = Math.floor(Date.now() / 1000) + 600; // 10minute from the add liquidity
 	const token1PerToken2 = tokenReserve[0] / tokenReserve[1];
 	let token2Amount = token1Amount * token1PerToken2;
@@ -83,6 +88,7 @@ export async function performTrade(
 	provider,
 	tokenReserve
 ) {
+	const contractAddress = await blockChainServer(provider);
 	checkTokenAllowance(amountIn, userAddress, tokenInAddress, provider);
 	const tokenReserve1 = ethers.utils.formatEther(tokenReserve[0])
 	const tokenReserve2 = ethers.utils.formatEther(tokenReserve[1])
@@ -103,7 +109,7 @@ export async function performTrade(
 	amountOutMin = ethers.utils.parseEther(amountOutMin.toString());
 	amountIn = ethers.utils.parseEther(amountIn.toString());
 
-	const contract = getContract(contractAddress, uniSwapRouter_ABI, provider, userAddress);
+	const contract = getContract(contractAddress.routerAddress, uniSwapRouter_ABI, provider, userAddress);
 	const deadline = Math.floor(Date.now() / 1000) + 600; // 10 minute from the swap
 	console.log(deadline)
 	switch (chainID) {
@@ -156,9 +162,10 @@ export async function performTrade(
 
 }
 
-export function calculateSlipageRatio(amountIn, tokenReserve, provider) {
+export async function calculateSlipageRatio(amountIn, tokenReserve, provider) {
+	const contractAddress = await blockChainServer(provider);
 	const amount = changeToEther(amountIn);
-	const contract = getContract(contractAddress, uniSwapRouter_ABI, provider);
+	const contract = getContract(contractAddress.routerAddress, uniSwapRouter_ABI, provider);
 	const amountOutV2 = contract.getAmountOut(amount, tokenReserve[0], tokenReserve[1]);
 	const slippage = slipCalcV2(amountIn, tokenReserve[0], tokenReserve[1], Fee);
 	return slippage / amountOutV2;
@@ -171,9 +178,9 @@ export async function useRemoveLiquidity(
 	userAddress,
 	provider,
 	tokenReserve) {
-
+	const contractAddress = await blockChainServer(provider);
 	const Token0andToken1 = await getTokenPairforToken0AndToken1(tokenAddress1, tokenAddress2, provider);
-	const contract = getContract(contractAddress, uniSwapRouter_ABI, provider, userAddress);
+	const contract = getContract(contractAddress.factoryAddress, uniSwapRouter_ABI, provider, userAddress);
 	const totalSupply = await getTotalSupply(tokenAddress1, tokenAddress2, provider);
 	let userBalance = await getUserBalance(tokenAddress1, tokenAddress2, provider, userAddress);
 	userBalance = ethers.utils.formatEther(userBalance);
@@ -243,6 +250,7 @@ function changeToEther(amount) {
 
 async function checkTokenAllowance(tokenAmount, userAddress, tokenAddress, provider) {
 	const tokenAllowance = await getTokenAllowance(userAddress, tokenAddress, provider)
+	console.log(tokenAmount);
 	if (tokenAmount >= tokenAllowance) {
 		getTokenApproval(userAddress, tokenAddress, provider);
 	} else {
@@ -261,12 +269,39 @@ async function checkTokenPairAllowance(tokenAddress1, tokenAddress2, provider, u
 	}
 }
 
-function calcAmountToken(amountIn, reserveToken0, reserveToken1) {
-	let inputToken0 = amountIn * (10 ** 18);
-	inputToken0 = new BigNumber(inputToken0);
-	const reserveToken0BN = new BigNumber(reserveToken0);
-	const reserveToken1BN = new BigNumber(reserveToken1);
-	const k = reserveToken0BN.times(reserveToken1BN);
-	const outputToken1 = k.dividedBy(reserveToken0BN.plus(inputToken0)).minus(reserveToken1BN);
-	return outputToken1.toString();
+async function blockChainServer(provider) {
+	let routerAddress = "";
+	let factoryAddress = "";
+	const network = await provider.getNetwork();
+	const chainID = network.chainId;
+	switch (chainID) {
+		case 1: // Etheruem net
+			routerAddress = etherRouterContract;
+			factoryAddress = etherFactoryContract;
+			break;
+
+		case 5: // goerli net
+			routerAddress = etherRouterContract;
+			factoryAddress = etherFactoryContract;
+			break;
+
+		case 56: // Binance net
+			routerAddress = binanceRouterContract;
+			factoryAddress = binanceFactoryContract;
+			break;
+
+		case 97: //Binance Testnet
+			routerAddress = binanceRouterContract;
+			factoryAddress = binanceFactoryContract;
+			break;
+
+		default:
+			console.warn('Unsupported network');
+			return;
+	}
+
+	return {
+		routerAddress: routerAddress,
+		factoryAddress: factoryAddress
+	}
 }
