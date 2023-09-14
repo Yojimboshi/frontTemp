@@ -240,7 +240,7 @@ const LiquidityPool = () => {
             onChange={handleToken2AmountChange}
           />
         </div>
-        {tokenReserve &&
+        {tokenReserve && tokenAddress1&& tokenAddress2&&
           <div
             className={
               "dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8"
@@ -267,7 +267,7 @@ const LiquidityPool = () => {
 
       </div>
       <div>
-        {tokenReserve && <h1>
+        {tokenReserve && tokenAddress1&& tokenAddress2&&<h1>
           {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
           {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
         </h1>}

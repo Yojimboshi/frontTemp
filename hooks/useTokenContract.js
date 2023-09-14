@@ -3,7 +3,8 @@ import ERC20_ABI from "../data/abi/erc20.json";
 import UniFactoryABI from "../data/abi/uniswapFactory.json";
 import UniPairABI from "../data/abi/uniswapPair.json";
 import { ethers } from "ethers";
-import { etherRouterContract, etherFactoryContract, binanceFactoryContract, binanceRouterContract } from "../config/setting";
+import {etherRouterContractV2,etherFactoryContractV2,binanceTestFactoryContractV2,binanceTestRouterContractV2,binanceFactoryContractV2,binanceRouterContractV2
+} from "../config/setting";
 
 export async function getTokenApproval(signer, tokenAddress, provider) {
 	const contractAddress = await blockChainServer(provider);
@@ -129,29 +130,29 @@ async function blockChainServer(provider) {
 	const chainID = network.chainId;
 	switch (chainID) {
 		case 1: // Etheruem net
-			routerAddress = etherRouterContract;
-			factoryAddress = etherFactoryContract;
-			break;
-
+		  routerAddress = etherRouterContractV2;
+		  factoryAddress = etherFactoryContractV2;
+		  break;
+	
 		case 5: // goerli net
-			routerAddress = etherRouterContract;
-			factoryAddress = etherFactoryContract;
-			break;
-
+		  routerAddress = etherRouterContractV2;
+		  factoryAddress = etherFactoryContractV2;
+		  break;
+	
 		case 56: // Binance net
-			routerAddress = binanceRouterContract;
-			factoryAddress = binanceFactoryContract;
-			break;
-
+		  routerAddress = binanceRouterContractV2;
+		  factoryAddress = binanceFactoryContractV2;
+		  break;
+	
 		case 97: //Binance Testnet
-			routerAddress = binanceRouterContract;
-			factoryAddress = binanceFactoryContract;
-			break;
-
+		  routerAddress = binanceTestRouterContractV2;
+		  factoryAddress = binanceTestFactoryContractV2;
+		  break;
+	
 		default:
-			console.warn('Unsupported network');
-			return;
-	}
+		  console.warn("Unsupported network");
+		  return;
+	  }
 	console.log(routerAddress)
 
 	return{

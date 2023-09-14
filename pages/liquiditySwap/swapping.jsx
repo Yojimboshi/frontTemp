@@ -185,7 +185,7 @@ const Swapping = () => {
 
       </div>
       <div>
-      {tokenReserve && <h1>
+      {tokenReserve && tokenAddress1&& tokenAddress2&& <h1>
           {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
           {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
         </h1>}
