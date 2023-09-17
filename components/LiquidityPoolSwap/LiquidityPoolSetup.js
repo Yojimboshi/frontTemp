@@ -68,6 +68,7 @@ export const setupLiquidityPool = async (args) => {
 };
 
 async function blockChainServer(provider) {
+  
   let routerAddress = etherRouterContractV2;
   let factoryAddress = etherFactoryContractV2;
   const network = await provider.getNetwork();
@@ -97,7 +98,6 @@ async function blockChainServer(provider) {
       console.warn("Unsupported network");
       return;
   }
-  console.log(routerAddress);
 
   return {
     routerAddress: routerAddress,

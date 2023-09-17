@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
 import { useRemoveLiquidity } from "../../hooks/useRouterContract";
 import { getTokenApproval, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
-import { getTokenLiquidityBalance, getPoolShareandUserBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
+import { getTokenLiquidityBalance, getPoolShareandUserBalance, getRemoveTokenLiquidityBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 
 const LiquidityPool = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
@@ -22,6 +22,7 @@ const LiquidityPool = () => {
   const [tokenSymbol2, setTokenSymbol2] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
   const [liquidityTokenBalance, setLiquidityTokenBalance] = useState("");
+  const [liquidityRemoveTokenBalance, setLiquidityRemoveTokenBalance] = useState("");
   const [userPoolShare, setUserPoolShare] = useState("");
   const { provider, defaultAccount } = SetupSwapPool();
 
@@ -40,14 +41,15 @@ const LiquidityPool = () => {
       setPrevTokenAmount2
     });
     if (tokenAddress1 == "" && tokenAddress2 == "") {
-      
+
     } else {
-    getLiquidityBalance();
-    getPoolShare();
-    getTokenSymbols();
+      getLiquidityBalance();
+      getPoolShare();
+      getTokenSymbols();
+      getRemovedLiquidityBalance();
     }
 
-  }, [tokenAddress1, tokenAddress2]);
+  }, [tokenAddress1, tokenAddress2, liquidityPercentage]);
 
   async function RemoveLiquidity() {
     if (!isNaN(tokenAmount1)) {
@@ -71,6 +73,12 @@ const LiquidityPool = () => {
     setLiquidityTokenBalance(liquidityBalance);
   }
 
+  async function getRemovedLiquidityBalance() {
+    const liquidityBalance = await getRemoveTokenLiquidityBalance(tokenAddress1, tokenAddress2, liquidityPercentage, provider, defaultAccount, tokenReserve)
+    setLiquidityRemoveTokenBalance(liquidityBalance);
+  }
+
+
   async function getPoolShare() {
     const userPoolShare = await getPoolShareandUserBalance(tokenAddress1, tokenAddress2, provider, defaultAccount);
     setUserPoolShare(userPoolShare);
@@ -93,11 +101,11 @@ const LiquidityPool = () => {
   };
 
   return (
-    <div className="mt-16 ml-64">
-      <h1 className="text-4xl">Remove Liquidity</h1>
+    <div className="flex flex-col items-center ">
+      <h1 className="text-4xl ">Remove Liquidity</h1>
       {/*<-- Swap and Pool--> */}
 
-      <div className="md:flex">
+      <div className="md:flex flex-col ">
         <div
           className={
             "dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8"
@@ -151,25 +159,53 @@ const LiquidityPool = () => {
             onChange={handleToken1AmountChange}
           />
         </div>
-        {tokenReserve && tokenAddress1&& tokenAddress2&&
+        {tokenReserve && tokenAddress1 && tokenAddress2 &&
           <div
             className={
               "dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8"
             }
           >
-            <h1>Token1 amount</h1>
-            <h1> Token 2 Amount</h1>
+            <h1>
+              Token Remove
+            </h1>
+            <h1>
+              {tokenSymbol1}: {liquidityRemoveTokenBalance.token0}
+            </h1>
+            <h1>
+              {tokenSymbol2}: {liquidityRemoveTokenBalance.token1}
+            </h1>
+            <h1>
+              {tokenReserve && tokenAddress1 && tokenAddress2 && <h1>
+                {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
+                {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
+              </h1>}
+            </h1>
+          </div>}
+        {tokenReserve && tokenAddress1 && tokenAddress2 &&
+          <div
+            className={
+              "dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8"
+            }
+          >
+            <h1>
+              Your Position
+            </h1>
+            <h1>
+              {tokenSymbol1}/{tokenSymbol2}: {userPoolShare.userBalance}
+            </h1>
+            <h1>
+              Your pool share: {userPoolShare.poolShare}%
+            </h1>
+            <h1>
+              {tokenSymbol1}: {liquidityTokenBalance.token0}
+            </h1>
+            <h1>
+              {tokenSymbol2}: {liquidityTokenBalance.token1}
+            </h1>
+
           </div>
         }
 
-      </div>
-      <div>
-        <h1>
-          {tokenReserve && tokenAddress1&& tokenAddress2&& <h1>
-            {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
-            {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
-          </h1>}
-        </h1>
       </div>
       <div>
         <button className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
@@ -178,6 +214,7 @@ const LiquidityPool = () => {
         </button>
       </div>
     </div>
+
 
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
 import { useAddLiquidity } from "../../hooks/useRouterContract";
 import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
-import { getTokenLiquidityBalance, getPoolShareandUserBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
+import { getTokenLiquidityBalance, getPoolShareandUserBalance, storeTokenAddress } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 
 const LiquidityPool = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
@@ -63,10 +63,13 @@ const LiquidityPool = () => {
 
   async function AddLiquidity() {
     if (!isNaN(tokenAmount1)) {
-      useAddLiquidity(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve)
+      useAddLiquidity(tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2, defaultAccount, provider, tokenReserve)
     }
   }
 
+  async function storetokenAddressInCookie(tokenAddress) {
+    storeTokenAddress(tokenAddress, provider);
+  }
   async function getLiquidityBalance() {
     const liquidityBalance = await getTokenLiquidityBalance(tokenAddress1, tokenAddress2, provider, defaultAccount, tokenReserve)
     setLiquidityTokenBalance(liquidityBalance);
@@ -121,6 +124,10 @@ const LiquidityPool = () => {
 
   const handleToken2AddressChange = (event) => {
     setTokenAddress2(event.target.value);
+  };
+
+  const handleStoreTokenAddress = async () => {
+    await storetokenAddressInCookie(tokenAddress1, provider);
   };
 
   const handleToken1AmountChange = async (event) => {
@@ -198,6 +205,10 @@ const LiquidityPool = () => {
             value={tokenAmount1}
             onChange={handleToken1AmountChange}
           />
+          <button className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
+            onClick={handleStoreTokenAddress}>
+            Store
+          </button>
         </div>
         <div
           className={
@@ -240,7 +251,7 @@ const LiquidityPool = () => {
             onChange={handleToken2AmountChange}
           />
         </div>
-        {tokenReserve && tokenAddress1&& tokenAddress2&&
+        {tokenReserve && tokenAddress1 && tokenAddress2 &&
           <div
             className={
               "dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8"
@@ -253,7 +264,7 @@ const LiquidityPool = () => {
               {tokenSymbol1}/{tokenSymbol2}: {userPoolShare.userBalance}
             </h1>
             <h1>
-              Your pool share: {userPoolShare.poolShare}
+              Your pool share: {userPoolShare.poolShare}%
             </h1>
             <h1>
               {tokenSymbol1}: {liquidityTokenBalance.token0}
@@ -267,7 +278,7 @@ const LiquidityPool = () => {
 
       </div>
       <div>
-        {tokenReserve && tokenAddress1&& tokenAddress2&&<h1>
+        {tokenReserve && tokenAddress1 && tokenAddress2 && <h1>
           {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
           {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
         </h1>}

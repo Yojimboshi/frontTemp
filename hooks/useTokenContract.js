@@ -3,14 +3,14 @@ import ERC20_ABI from "../data/abi/erc20.json";
 import UniFactoryABI from "../data/abi/uniswapFactory.json";
 import UniPairABI from "../data/abi/uniswapPair.json";
 import { ethers } from "ethers";
-import {etherRouterContractV2,etherFactoryContractV2,binanceTestFactoryContractV2,binanceTestRouterContractV2,binanceFactoryContractV2,binanceRouterContractV2
+import {
+	etherRouterContractV2, etherFactoryContractV2, binanceTestFactoryContractV2, binanceTestRouterContractV2, binanceFactoryContractV2, binanceRouterContractV2
 } from "../config/setting";
 
 export async function getTokenApproval(signer, tokenAddress, provider) {
 	const contractAddress = await blockChainServer(provider);
 	const contract = getContract(tokenAddress, ERC20_ABI, provider, signer);
 	const spenderBalance = 2 ^ 256 - 1;
-	console.log(contractAddress.routerAddress);
 	try {
 		await contract.approve(contractAddress.routerAddress, spenderBalance);
 	} catch (error) {
@@ -43,7 +43,7 @@ export async function getTokenAllowance(userAddress, tokenAddress, provider) {
 }
 
 export async function getTokenSymbol(tokenAddress, provider) {
-	
+
 	const contract = getContract(tokenAddress, ERC20_ABI, provider)
 	try {
 		const tokenSymbol = await contract.symbol();
@@ -74,7 +74,6 @@ export async function getUserBalance(tokenAddress1, tokenAddress2, provider, use
 
 export async function getTotalSupply(tokenAddress1, tokenAddress2, provider) {
 	const contractAddress = await blockChainServer(provider);
-	console.log(contractAddress.routerAddress);
 	const FactoryContract = getContract(contractAddress.factoryAddress, UniFactoryABI, provider)
 	const liquidityPoolAddress = await FactoryContract.getPair(tokenAddress1, tokenAddress2);
 	const pairContract = getContract(liquidityPoolAddress, UniPairABI, provider);
@@ -84,7 +83,6 @@ export async function getTotalSupply(tokenAddress1, tokenAddress2, provider) {
 
 export async function getTokenPairforToken0AndToken1(tokenAddress1, tokenAddress2, provider) {
 	const contractAddress = await blockChainServer(provider);
-	console.log(contractAddress.factoryAddress);
 	const FactoryContract = getContract(contractAddress.factoryAddress, UniFactoryABI, provider)
 	const liquidityPoolAddress = await FactoryContract.getPair(tokenAddress1, tokenAddress2);
 	const pairContract = getContract(liquidityPoolAddress, UniPairABI, provider);
@@ -130,32 +128,31 @@ async function blockChainServer(provider) {
 	const chainID = network.chainId;
 	switch (chainID) {
 		case 1: // Etheruem net
-		  routerAddress = etherRouterContractV2;
-		  factoryAddress = etherFactoryContractV2;
-		  break;
-	
-		case 5: // goerli net
-		  routerAddress = etherRouterContractV2;
-		  factoryAddress = etherFactoryContractV2;
-		  break;
-	
-		case 56: // Binance net
-		  routerAddress = binanceRouterContractV2;
-		  factoryAddress = binanceFactoryContractV2;
-		  break;
-	
-		case 97: //Binance Testnet
-		  routerAddress = binanceTestRouterContractV2;
-		  factoryAddress = binanceTestFactoryContractV2;
-		  break;
-	
-		default:
-		  console.warn("Unsupported network");
-		  return;
-	  }
-	console.log(routerAddress)
+			routerAddress = etherRouterContractV2;
+			factoryAddress = etherFactoryContractV2;
+			break;
 
-	return{
+		case 5: // goerli net
+			routerAddress = etherRouterContractV2;
+			factoryAddress = etherFactoryContractV2;
+			break;
+
+		case 56: // Binance net
+			routerAddress = binanceRouterContractV2;
+			factoryAddress = binanceFactoryContractV2;
+			break;
+
+		case 97: //Binance Testnet
+			routerAddress = binanceTestRouterContractV2;
+			factoryAddress = binanceTestFactoryContractV2;
+			break;
+
+		default:
+			console.warn("Unsupported network");
+			return;
+	}
+
+	return {
 		routerAddress: routerAddress,
 		factoryAddress: factoryAddress
 	}

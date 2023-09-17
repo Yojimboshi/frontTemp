@@ -3,7 +3,7 @@ import SetupSwapPool from "../../components/LiquidityPoolSwap/SetupSwapPool";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
 import { performTrade } from "../../hooks/useRouterContract";
 import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
-
+import { getPriceImpact } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 const Swapping = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
   const [tokenAddress2, setTokenAddress2] = useState("");
@@ -23,6 +23,7 @@ const Swapping = () => {
   const [token1Balance, setToken1Balance] = useState("");
   const [token2Balance, setToken2Balance] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
+  const [priceImpact, setPriceImpact] = useState("");
   const { provider, uniFactoryContract, uniRouterContract, defaultAccount } = SetupSwapPool();
 
 
@@ -44,9 +45,10 @@ const Swapping = () => {
       setPrevTokenAmount1,
       setPrevTokenAmount2
     });
-    if(tokenAddress1 != "" && tokenAddress2 != ""){
+    if (tokenAddress1 != "" && tokenAddress2 != "") {
       getTokenSymbols();
       getTokenBalances();
+      getPriceImpactforDisplay();
     }
 
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
@@ -74,13 +76,18 @@ const Swapping = () => {
     }
   }
 
+  async function getPriceImpactforDisplay() {
+    const priceImpactAmount = await getPriceImpact(tokenAmount1,tokenAddress1, tokenAddress2, provider, tokenReserve)
+    setPriceImpact(priceImpactAmount);
+  }
+
   {/*<---- Interface Handler ----> */ }
 
   const swapToken = async () => {
-    if(!isNaN(tokenAmount1)){
+    if (!isNaN(tokenAmount1)) {
       performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
     }
-    
+
   };
 
   const handleToken1AddressChange = (event) => {
@@ -105,12 +112,13 @@ const Swapping = () => {
 
   return (
     <div className="mt-16 ml-64">
+
       <h1 className="text-4xl">Swap</h1>
       {/*<-- Swap and Pool--> */}
 
       <div className="flex flex-wrap">
         <div className="dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8 pt-4 pb-4 flex flex-col">
-        <div className="flex">
+          <div className="flex">
             <h1 className=" mr-2 flex-grow">
               {tokenSymbol1 ? `${tokenSymbol1} address` : "Token 1 Address"}
             </h1>
@@ -147,7 +155,7 @@ const Swapping = () => {
         </div>
 
         <div className="dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8 pt-4 pb-4 flex flex-col">
-        <div className="flex">
+          <div className="flex">
             <h1 className=" mr-2 flex-grow">
               {tokenSymbol2 ? `${tokenSymbol2} address` : "Token 2 Address"}
             </h1>
@@ -184,8 +192,24 @@ const Swapping = () => {
         </div>
 
       </div>
+      <div className="flex flex-wrap">
+        {tokenReserve && tokenAddress1 && tokenAddress2 && tokenQuote2 &&
+          <div
+            className={
+              "dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-8"
+            }
+          >
+            <h1>
+              1 {tokenSymbol1}  = {(tokenAmount1 / tokenQuote2).toFixed(5)} {tokenSymbol2}
+            </h1>
+            <h1>
+              Price Impact: {priceImpact}
+            </h1>
+          </div>
+        }
+      </div>
       <div>
-      {tokenReserve && tokenAddress1&& tokenAddress2&& <h1>
+        {tokenReserve && tokenAddress1 && tokenAddress2 && <h1>
           {tokenSymbol1} per {tokenSymbol2}: {(tokenReserve[0] / tokenReserve[1]).toFixed(6)} {'\n'} {tokenSymbol2} per {tokenSymbol1}:{" "}
           {(tokenReserve[1] / tokenReserve[0]).toFixed(6)}
         </h1>}
