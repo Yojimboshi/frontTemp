@@ -751,7 +751,7 @@ export default function Header01() {
                 </Link>
               </div>
             </div>
-            <DarkMode />
+
             <div className="js-nav-dropdown group-dropdown relative">
               <button className="dropdown-toggle border-jacarta-100 hover:bg-accent focus:bg-accent group dark:hover:bg-accent ml-2 flex h-10 w-10 items-center justify-center rounded-full border bg-white transition-colors hover:border-transparent focus:border-transparent dark:border-transparent dark:bg-white/[.15]">
                 <svg
@@ -769,7 +769,7 @@ export default function Header01() {
                 <BlockchainNetworkSwitcher/>
               </div>
             </div>
-
+            <DarkMode />
           </div>
           {/* End header right content (metamask and other) for desktop */}
         </div>

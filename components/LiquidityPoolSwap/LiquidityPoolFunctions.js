@@ -6,7 +6,7 @@ import {
   getTokenPairforToken0AndToken1,
   getTokenSymbol,
 } from "../../hooks/useTokenContract";
-import Cookies from 'js-cookie';
+
 export async function getTokenLiquidityBalance(
   tokenAddress1,
   tokenAddress2,

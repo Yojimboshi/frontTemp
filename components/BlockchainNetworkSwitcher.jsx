@@ -93,9 +93,11 @@ function BlockchainNetworkSwitcher() {
   return (
     <div>
       <h1>Blockchain Network Switcher</h1>
-      <select value={selectedNetwork} onChange={handleNetworkChange}>
+      <select className='text-jacarta-700 placeholder-jacarta-500 focus:ring-accent border-jacarta-100 w-full rounded-2xl border py-[0.6875rem] px-4 dark:border-transparent dark:bg-white/[.15] dark:text-white dark:placeholder-white' 
+      value={selectedNetwork} onChange={handleNetworkChange}>
         {networks.map((network) => (
-          <option key={network.id} value={network.id}>
+          <option
+          key={network.id} value={network.id}>
             {network.name}
           </option>
         ))}

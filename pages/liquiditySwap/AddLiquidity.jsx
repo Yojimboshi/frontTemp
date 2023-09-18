@@ -3,7 +3,7 @@ import SetupSwapPool from "../../components/LiquidityPoolSwap/SetupSwapPool";
 import { useEffect, useState } from "react";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
 import { useAddLiquidity } from "../../hooks/useRouterContract";
-import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
+import { getUserTokenBalance, getTokenAllowance, getTokenSymbol,getTokenPairforToken0AndToken1 } from "../../hooks/useTokenContract";
 import { getTokenLiquidityBalance, getPoolShareandUserBalance, storeTokenAddress } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 
 const LiquidityPool = () => {
@@ -27,6 +27,7 @@ const LiquidityPool = () => {
   const [liquidityTokenBalance, setLiquidityTokenBalance] = useState("");
   const [userPoolShare, setUserPoolShare] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
+  const [tokenPairAddress, setTokenPairAddress] = useState('');
   const { provider, defaultAccount } = SetupSwapPool();
 
 
@@ -57,6 +58,7 @@ const LiquidityPool = () => {
       getTokenSymbols();
       getTokenBalances();
       setTokenPairState(true);
+      setTokenQuote(tokenAddress1,tokenAddress2,provider);
     }
 
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
@@ -114,6 +116,11 @@ const LiquidityPool = () => {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async function setTokenQuote(tokenAddress1, tokenAddress2, provider) {
+    const tokenPairAddress = await getTokenPairforToken0AndToken1(tokenAddress1, tokenAddress2, provider);
+    setTokenPairAddress(tokenPairAddress);
   }
 
   {/*<---- Interface Handler ----> */ }
