@@ -5,7 +5,8 @@ import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/Liquidity
 import { useAddLiquidity } from "../../hooks/useRouterContract";
 import { getUserTokenBalance, getTokenAllowance, getTokenSymbol,getTokenPairforToken0AndToken1 } from "../../hooks/useTokenContract";
 import { getTokenLiquidityBalance, getPoolShareandUserBalance, storeTokenAddress } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
-
+import {addSerializedToken} from "../../redux/user/reducer";
+import { useDispatch, useSelector } from "react-redux";
 const LiquidityPool = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
   const [tokenAddress2, setTokenAddress2] = useState("");
@@ -29,8 +30,8 @@ const LiquidityPool = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const [tokenPairAddress, setTokenPairAddress] = useState('');
   const { provider, defaultAccount } = SetupSwapPool();
-
-
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.user.tokens)
   useEffect(() => {
 
     setupLiquidityPool({
@@ -69,9 +70,6 @@ const LiquidityPool = () => {
     }
   }
 
-  async function storetokenAddressInCookie(tokenAddress) {
-    storeTokenAddress(tokenAddress, provider);
-  }
   async function getLiquidityBalance() {
     const liquidityBalance = await getTokenLiquidityBalance(tokenAddress1, tokenAddress2, provider, defaultAccount, tokenReserve)
     setLiquidityTokenBalance(liquidityBalance);
@@ -134,7 +132,29 @@ const LiquidityPool = () => {
   };
 
   const handleStoreTokenAddress = async () => {
-    await storetokenAddressInCookie(tokenAddress1, provider);
+    const network = await provider.getNetwork();
+    const chainID = network.chainId;
+
+    const serializedTokenData = {
+      chainId: 1, 
+      address: tokenAddress1,
+      symbol: "SPT", 
+    };
+
+    dispatch(addSerializedToken({
+      serializedToken: serializedTokenData,
+    }));
+    if (user) {
+      console.log("Serialized Token Data:", user);
+    
+      // Access and log the 'symbol' property of the first token in the example
+      if (user[1] && user[1][tokenAddress1]) {
+        const firstToken = user[1][tokenAddress1];
+        console.log("Symbol:", firstToken.symbol);
+      }
+    } else {
+      console.log("No serialized token data found.");
+    }
   };
 
   const handleToken1AmountChange = async (event) => {
