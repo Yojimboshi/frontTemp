@@ -1,12 +1,12 @@
-import { ethers } from "ethers";
 import SetupSwapPool from "../../components/LiquidityPoolSwap/SetupSwapPool";
 import { useEffect, useState } from "react";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
 import { useAddLiquidity } from "../../hooks/useRouterContract";
-import { getUserTokenBalance, getTokenAllowance, getTokenSymbol,getTokenPairforToken0AndToken1 } from "../../hooks/useTokenContract";
-import { getTokenLiquidityBalance, getPoolShareandUserBalance, storeTokenAddress } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
-import {addSerializedToken} from "../../redux/user/reducer";
+import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
+import { getTokenLiquidityBalance, getPoolShareandUserBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
+import { addSerializedToken } from "../../redux/user/reducer";
 import { useDispatch, useSelector } from "react-redux";
+
 const LiquidityPool = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
   const [tokenAddress2, setTokenAddress2] = useState("");
@@ -17,8 +17,6 @@ const LiquidityPool = () => {
   const [tokenQuote2, setTokenQuote2] = useState(null);
   const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
   const [prevTokenAmount2, setPrevTokenAmount2] = useState("");
-  const [tokenApproved, setTokenApproved] = useState(true);
-  const [tokenPairState, setTokenPairState] = useState(false);
   const [buttonText, setButtonText] = useState('Insert Token Pair');
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [tokenSymbol1, setTokenSymbol1] = useState("");
@@ -28,12 +26,12 @@ const LiquidityPool = () => {
   const [liquidityTokenBalance, setLiquidityTokenBalance] = useState("");
   const [userPoolShare, setUserPoolShare] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
-  const [tokenPairAddress, setTokenPairAddress] = useState('');
+  const [selectedOption2, setSelectedOption2] = useState('');
+  const [chainId, setchainId] = useState("");
   const { provider, defaultAccount } = SetupSwapPool();
   const dispatch = useDispatch();
-  const user = useSelector(state => state.user.tokens)
+  const tokensByChainId = useSelector((state) => state.user.tokens);
   useEffect(() => {
-
     setupLiquidityPool({
       tokenAddress1,
       tokenAddress2,
@@ -49,17 +47,13 @@ const LiquidityPool = () => {
       setPrevTokenAmount1,
       setPrevTokenAmount2
     });
-
-    if (tokenAddress1 == "" && tokenAddress2 == "") {
-      setTokenPairState(false);
-    } else {
+    getChainId();
+    if (tokenAddress1 != "" && tokenAddress2 != "") {
       getLiquidityBalance();
       getPoolShare();
-      checkAllowance();
       getTokenSymbols();
       getTokenBalances();
-      setTokenPairState(true);
-      setTokenQuote(tokenAddress1,tokenAddress2,provider);
+      setTokenQuote(tokenAddress1, tokenAddress2, provider);
     }
 
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
@@ -70,6 +64,13 @@ const LiquidityPool = () => {
     }
   }
 
+  async function getChainId() {
+    ethereum.request({ method: 'eth_chainId' })
+      .then((chainIdHex) => {
+        const chainId = parseInt(chainIdHex, 16); // Convert from hexadecimal to decimal
+        setchainId(chainId.toString());
+      })
+  }
   async function getLiquidityBalance() {
     const liquidityBalance = await getTokenLiquidityBalance(tokenAddress1, tokenAddress2, provider, defaultAccount, tokenReserve)
     setLiquidityTokenBalance(liquidityBalance);
@@ -102,24 +103,10 @@ const LiquidityPool = () => {
     }
   }
 
-  async function checkAllowance() {
-    try {
-      const tokenAllowance = await getTokenAllowance(defaultAccount, tokenAddress1, provider);
-      const tokenAllowance2 = await getTokenAllowance(defaultAccount, tokenAddress2, provider);
-      if (tokenAllowance < tokenAmount1 || tokenAllowance2 < tokenAmount2) {
-        setTokenApproved(false);
-      } else {
-        setTokenApproved(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function setTokenQuote(tokenAddress1, tokenAddress2, provider) {
-    const tokenPairAddress = await getTokenPairforToken0AndToken1(tokenAddress1, tokenAddress2, provider);
-    setTokenPairAddress(tokenPairAddress);
-  }
+  const options = Object.keys(tokensByChainId[chainId] || {}).map((address) => ({
+    value: address,
+    label: tokensByChainId[chainId][address].symbol,
+  }));
 
   {/*<---- Interface Handler ----> */ }
 
@@ -131,30 +118,41 @@ const LiquidityPool = () => {
     setTokenAddress2(event.target.value);
   };
 
-  const handleStoreTokenAddress = async () => {
+
+  const handleStoreTokenAddress1 = async () => {
     const network = await provider.getNetwork();
     const chainID = network.chainId;
-
+    const tokenSymbol = await getTokenSymbol(tokenAddress1, provider);
+    console.log(tokenSymbol);
     const serializedTokenData = {
-      chainId: 1, 
+      chainId: chainID,
       address: tokenAddress1,
-      symbol: "SPT", 
+      symbol: tokenSymbol,
     };
 
     dispatch(addSerializedToken({
       serializedToken: serializedTokenData,
     }));
-    if (user) {
-      console.log("Serialized Token Data:", user);
-    
-      // Access and log the 'symbol' property of the first token in the example
-      if (user[1] && user[1][tokenAddress1]) {
-        const firstToken = user[1][tokenAddress1];
-        console.log("Symbol:", firstToken.symbol);
-      }
-    } else {
-      console.log("No serialized token data found.");
+    console.log("asda")
+  };
+  const handleStoreTokenAddress2 = async () => {
+    try {
+      const network = await provider.getNetwork();
+      const chainID = network.chainId;
+      const tokenSymbol = await getTokenSymbol(tokenAddress2, provider);
+      const serializedTokenData = {
+        chainId: chainID,
+        address: tokenAddress2,
+        symbol: tokenSymbol,
+      };
+
+      dispatch(addSerializedToken({
+        serializedToken: serializedTokenData,
+      }));
+    } catch (error) {
+      return
     }
+
   };
 
   const handleToken1AmountChange = async (event) => {
@@ -185,6 +183,12 @@ const LiquidityPool = () => {
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
   };
+  
+  const handleOption2Change = (event) => {
+    setSelectedOption2(event.target.value);
+  };
+
+
 
   return (
     <div className="mt-16 ml-64">
@@ -202,13 +206,15 @@ const LiquidityPool = () => {
               {tokenSymbol1 ? `${tokenSymbol1} address` : "Token 1 Address"}
             </h1>
             <select
+              id="optionDropdown"
               value={selectedOption}
               onChange={handleOptionChange}
             >
-              <option value="">Select an Option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -233,7 +239,7 @@ const LiquidityPool = () => {
             onChange={handleToken1AmountChange}
           />
           <button className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
-            onClick={handleStoreTokenAddress}>
+            onClick={handleStoreTokenAddress1}>
             Store
           </button>
         </div>
@@ -247,13 +253,15 @@ const LiquidityPool = () => {
               {tokenSymbol2 ? `${tokenSymbol2} address` : "Token 2 Address"}
             </h1>
             <select
-              value={selectedOption}
-              onChange={handleOptionChange}
+              id="optionDropdown"
+              value={selectedOption2}
+              onChange={handleOption2Change}
             >
-              <option value="">Select an Option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -277,6 +285,10 @@ const LiquidityPool = () => {
             value={tokenQuote2}
             onChange={handleToken2AmountChange}
           />
+          <button className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
+            onClick={handleStoreTokenAddress2}>
+            Store
+          </button>
         </div>
         {tokenReserve && tokenAddress1 && tokenAddress2 &&
           <div

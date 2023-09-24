@@ -4,6 +4,7 @@ import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/Liquidity
 import { performTrade } from "../../hooks/useRouterContract";
 import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
 import { getPriceImpact } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
+import { useSelector } from "react-redux";
 const Swapping = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
   const [tokenAddress2, setTokenAddress2] = useState("");
@@ -14,18 +15,15 @@ const Swapping = () => {
   const [tokenQuote2, setTokenQuote2] = useState(null);
   const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
   const [prevTokenAmount2, setPrevTokenAmount2] = useState("");
-  const [tokenApproved, setTokenApproved] = useState(true);
-  const [tokenPairState, setTokenPairState] = useState(false);
-  const [buttonText, setButtonText] = useState('Insert Token Pair');
-  const [buttonDisabled, setButtonDisabled] = useState(true);
   const [tokenSymbol1, setTokenSymbol1] = useState("");
   const [tokenSymbol2, setTokenSymbol2] = useState("");
   const [token1Balance, setToken1Balance] = useState("");
   const [token2Balance, setToken2Balance] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
   const [priceImpact, setPriceImpact] = useState("");
-  const { provider, uniFactoryContract, uniRouterContract, defaultAccount } = SetupSwapPool();
-
+  const [chainId, setchainId] = useState("");
+  const { provider, defaultAccount } = SetupSwapPool();
+  const tokensByChainId = useSelector((state) => state.user.tokens);
 
   useEffect(() => {
     setupLiquidityPool({
@@ -34,8 +32,6 @@ const Swapping = () => {
       tokenAmount1,
       tokenAmount2,
       provider,
-      uniFactoryContract,
-      uniRouterContract,
       tokenReserve,
       prevTokenAmount1,
       prevTokenAmount2,
@@ -45,6 +41,7 @@ const Swapping = () => {
       setPrevTokenAmount1,
       setPrevTokenAmount2
     });
+    getChainId()
     if (tokenAddress1 != "" && tokenAddress2 != "") {
       getTokenSymbols();
       getTokenBalances();
@@ -76,8 +73,21 @@ const Swapping = () => {
     }
   }
 
+  async function getChainId() {
+    ethereum.request({ method: 'eth_chainId' })
+      .then((chainIdHex) => {
+        const chainId = parseInt(chainIdHex, 16); // Convert from hexadecimal to decimal
+        setchainId(chainId.toString());
+      })
+  }
+
+  const options = Object.keys(tokensByChainId[chainId] || {}).map((address) => ({
+    value: address,
+    label: tokensByChainId[chainId][address].symbol,
+  }));
+
   async function getPriceImpactforDisplay() {
-    const priceImpactAmount = await getPriceImpact(tokenAmount1,tokenAddress1, tokenAddress2, provider, tokenReserve)
+    const priceImpactAmount = await getPriceImpact(tokenAmount1, tokenAddress1, tokenAddress2, provider, tokenReserve)
     setPriceImpact(priceImpactAmount);
   }
 
@@ -123,13 +133,15 @@ const Swapping = () => {
               {tokenSymbol1 ? `${tokenSymbol1} address` : "Token 1 Address"}
             </h1>
             <select
+              id="optionDropdown"
               value={selectedOption}
               onChange={handleOptionChange}
             >
-              <option value="">Select an Option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex flex-col">
@@ -160,13 +172,15 @@ const Swapping = () => {
               {tokenSymbol2 ? `${tokenSymbol2} address` : "Token 2 Address"}
             </h1>
             <select
+              id="optionDropdown"
               value={selectedOption}
               onChange={handleOptionChange}
             >
-              <option value="">Select an Option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex flex-col">

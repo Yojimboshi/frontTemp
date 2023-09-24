@@ -2,8 +2,9 @@ import SetupSwapPool from "../../components/LiquidityPoolSwap/SetupSwapPool";
 import { useEffect, useState } from "react";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
 import { useRemoveLiquidity } from "../../hooks/useRouterContract";
-import { getTokenApproval, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
+import { getTokenSymbol } from "../../hooks/useTokenContract";
 import { getTokenLiquidityBalance, getPoolShareandUserBalance, getRemoveTokenLiquidityBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
+import { useSelector } from "react-redux";
 
 const LiquidityPool = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
@@ -13,19 +14,16 @@ const LiquidityPool = () => {
   const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
   const [prevTokenAmount2, setPrevTokenAmount2] = useState("");
   const [tokenQuote1, setTokenQuote1] = useState(null);
-  const [tokenQuote2, setTokenQuote2] = useState(null);
-  const [tokenApproved, setTokenApproved] = useState(true);
-  const [tokenPairState, setTokenPairState] = useState(false);
-  const [buttonText, setButtonText] = useState('Insert Token Pair');
-  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [tokenQuote2, setTokenQuote2] = useState(null);;
   const [tokenSymbol1, setTokenSymbol1] = useState("");
   const [tokenSymbol2, setTokenSymbol2] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
   const [liquidityTokenBalance, setLiquidityTokenBalance] = useState("");
   const [liquidityRemoveTokenBalance, setLiquidityRemoveTokenBalance] = useState("");
   const [userPoolShare, setUserPoolShare] = useState("");
+  const [chainId, setchainId] = useState("");
   const { provider, defaultAccount } = SetupSwapPool();
-
+  const tokensByChainId = useSelector((state) => state.user.tokens);
   useEffect(() => {
     setupLiquidityPool({
       tokenAddress1,
@@ -40,6 +38,7 @@ const LiquidityPool = () => {
       setPrevTokenAmount1,
       setPrevTokenAmount2
     });
+    getChainId();
     if (tokenAddress1 == "" && tokenAddress2 == "") {
 
     } else {
@@ -78,6 +77,18 @@ const LiquidityPool = () => {
     setLiquidityRemoveTokenBalance(liquidityBalance);
   }
 
+  async function getChainId() {
+    ethereum.request({ method: 'eth_chainId' })
+      .then((chainIdHex) => {
+        const chainId = parseInt(chainIdHex, 16); // Convert from hexadecimal to decimal
+        setchainId(chainId.toString());
+      })
+  }
+
+  const options = Object.keys(tokensByChainId[chainId] || {}).map((address) => ({
+    value: address,
+    label: tokensByChainId[chainId][address].symbol,
+  }));
 
   async function getPoolShare() {
     const userPoolShare = await getPoolShareandUserBalance(tokenAddress1, tokenAddress2, provider, defaultAccount);
@@ -116,13 +127,15 @@ const LiquidityPool = () => {
               {tokenSymbol1 ? `${tokenSymbol1} address` : "Token 1 Address"}
             </h1>
             <select
+              id="optionDropdown"
               value={selectedOption}
               onChange={handleOptionChange}
             >
-              <option value="">Select an Option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           <input
@@ -136,13 +149,15 @@ const LiquidityPool = () => {
               {tokenSymbol2 ? `${tokenSymbol2} address` : "Token 2 Address"}
             </h1>
             <select
+              id="optionDropdown"
               value={selectedOption}
               onChange={handleOptionChange}
             >
-              <option value="">Select an Option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           <input

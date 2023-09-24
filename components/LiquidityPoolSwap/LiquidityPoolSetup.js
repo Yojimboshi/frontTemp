@@ -68,7 +68,12 @@ export const setupLiquidityPool = async (args) => {
 };
 
 async function blockChainServer(provider) {
-  
+  if (provider === undefined) {
+    return {
+      routerAddress: etherRouterContractV2,
+      factoryAddress: etherFactoryContractV2,
+    };
+  }
   let routerAddress = etherRouterContractV2;
   let factoryAddress = etherFactoryContractV2;
   const network = await provider.getNetwork();
