@@ -53,7 +53,6 @@ const LiquidityPool = () => {
       getPoolShare();
       getTokenSymbols();
       getTokenBalances();
-      setTokenQuote(tokenAddress1, tokenAddress2, provider);
     }
 
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
@@ -120,35 +119,43 @@ const LiquidityPool = () => {
 
 
   const handleStoreTokenAddress1 = async () => {
-    const network = await provider.getNetwork();
-    const chainID = network.chainId;
-    const tokenSymbol = await getTokenSymbol(tokenAddress1, provider);
-    console.log(tokenSymbol);
-    const serializedTokenData = {
-      chainId: chainID,
-      address: tokenAddress1,
-      symbol: tokenSymbol,
-    };
+    try {
+      const network = await provider.getNetwork();
+      const chainID = network.chainId;
+      const tokenSymbol = await getTokenSymbol(tokenAddress1, provider);
+      if(typeof tokenSymbol != "undefined"){
+        const serializedTokenData = {
+          chainId: chainID,
+          address: tokenAddress1,
+          symbol: tokenSymbol,
+        };
+  
+        dispatch(addSerializedToken({
+          serializedToken: serializedTokenData,
+        }));
+      }
 
-    dispatch(addSerializedToken({
-      serializedToken: serializedTokenData,
-    }));
-    console.log("asda")
+    } catch (error) {
+      return;
+    }
+
   };
   const handleStoreTokenAddress2 = async () => {
     try {
       const network = await provider.getNetwork();
       const chainID = network.chainId;
       const tokenSymbol = await getTokenSymbol(tokenAddress2, provider);
-      const serializedTokenData = {
-        chainId: chainID,
-        address: tokenAddress2,
-        symbol: tokenSymbol,
-      };
-
-      dispatch(addSerializedToken({
-        serializedToken: serializedTokenData,
-      }));
+      if(typeof tokenSymbol != "undefined"){
+        const serializedTokenData = {
+          chainId: chainID,
+          address: tokenAddress2,
+          symbol: tokenSymbol,
+        };
+  
+        dispatch(addSerializedToken({
+          serializedToken: serializedTokenData,
+        }));
+      }
     } catch (error) {
       return
     }
@@ -182,10 +189,12 @@ const LiquidityPool = () => {
 
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
+    setTokenAddress1(event.target.value)
   };
-  
+
   const handleOption2Change = (event) => {
     setSelectedOption2(event.target.value);
+    setTokenAddress2(event.target.value)
   };
 
 
@@ -210,6 +219,9 @@ const LiquidityPool = () => {
               value={selectedOption}
               onChange={handleOptionChange}
             >
+              <option disabled value="">
+                Select an option
+              </option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -252,11 +264,15 @@ const LiquidityPool = () => {
             <h1 className=" mr-2 flex-grow">
               {tokenSymbol2 ? `${tokenSymbol2} address` : "Token 2 Address"}
             </h1>
+
             <select
               id="optionDropdown"
               value={selectedOption2}
               onChange={handleOption2Change}
             >
+              <option disabled value="">
+                Select an option
+              </option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}

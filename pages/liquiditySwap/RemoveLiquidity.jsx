@@ -18,6 +18,7 @@ const LiquidityPool = () => {
   const [tokenSymbol1, setTokenSymbol1] = useState("");
   const [tokenSymbol2, setTokenSymbol2] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption2, setSelectedOption2] = useState('');
   const [liquidityTokenBalance, setLiquidityTokenBalance] = useState("");
   const [liquidityRemoveTokenBalance, setLiquidityRemoveTokenBalance] = useState("");
   const [userPoolShare, setUserPoolShare] = useState("");
@@ -109,6 +110,12 @@ const LiquidityPool = () => {
 
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
+    setTokenAddress1(event.target.value)
+  };
+
+  const handleOption2Change = (event) => {
+    setSelectedOption2(event.target.value);
+    setTokenAddress2(event.target.value)
   };
 
   return (
@@ -131,6 +138,9 @@ const LiquidityPool = () => {
               value={selectedOption}
               onChange={handleOptionChange}
             >
+              <option disabled value="">
+                Select an option
+              </option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -150,9 +160,12 @@ const LiquidityPool = () => {
             </h1>
             <select
               id="optionDropdown"
-              value={selectedOption}
-              onChange={handleOptionChange}
+              value={selectedOption2}
+              onChange={handleOption2Change}
             >
+              <option disabled value="">
+                Select an option
+              </option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}

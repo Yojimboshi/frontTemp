@@ -36,5 +36,8 @@ export default function useNumberGame() {
     const withdraw = () => {
         return contract.withdraw({gasLimit: 100000});
     };
+    const availableGame = () =>{
+        
+    }
     return { joinGame, guess, withdraw };
 }

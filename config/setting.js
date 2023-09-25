@@ -1,4 +1,4 @@
-const numberGameAddress = "0x8785bb53Ba509A1ceF69EA983F272A60C008320b";
+const numberGameAddress = "0xb38Bb8FEfCD7023B92CFe609b5B9760C1E11541b";
 const nftContractAddress = "0xB76D32661f7EAC3A10E3Fa9Ec7510C71e058f527";
 const providerURL = "https://goerli.infura.io/v3/5af30ed60a8b4765a596afccb963efe4";
 const etherRouterContractV2 = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";

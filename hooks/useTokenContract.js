@@ -1,5 +1,6 @@
 import { getContract } from "../hooks/useContracts";
 import ERC20_ABI from "../data/abi/erc20.json";
+import BEP20_ABI from "../data/abi/bep20.json";
 import UniFactoryABI from "../data/abi/uniswapFactory.json";
 import UniPairABI from "../data/abi/uniswapPair.json";
 import { ethers } from "ethers";
@@ -9,7 +10,7 @@ import {
 
 export async function getTokenApproval(signer, tokenAddress, provider) {
 	const contractAddress = await blockChainServer(provider);
-	const contract = getContract(tokenAddress, ERC20_ABI, provider, signer);
+	const contract = getContract(tokenAddress, contractAddress.tokenABI, provider, signer);
 	const spenderBalance = 2 ^ 256 - 1;
 	try {
 		await contract.approve(contractAddress.routerAddress, spenderBalance);
@@ -19,7 +20,8 @@ export async function getTokenApproval(signer, tokenAddress, provider) {
 }
 
 export async function getUserTokenBalance(userAddress, tokenAddress, provider) {
-	const contract = getContract(tokenAddress, ERC20_ABI, provider)
+	const TokenABIChange = await blockChainServer(provider);
+	const contract = getContract(tokenAddress, TokenABIChange.tokenABI, provider)
 	try {
 		let userBalance = await contract.balanceOf(userAddress);
 		userBalance = ethers.utils.formatEther(userBalance)
@@ -32,7 +34,7 @@ export async function getUserTokenBalance(userAddress, tokenAddress, provider) {
 
 export async function getTokenAllowance(userAddress, tokenAddress, provider) {
 	const contractAddress = await blockChainServer(provider);
-	const contract = getContract(tokenAddress, ERC20_ABI, provider)
+	const contract = getContract(tokenAddress, contractAddress.tokenABI, provider)
 	try {
 		let userTokenAllowance = await contract.allowance(userAddress, contractAddress.routerAddress);
 		userTokenAllowance = ethers.utils.formatEther(userTokenAllowance);
@@ -43,8 +45,8 @@ export async function getTokenAllowance(userAddress, tokenAddress, provider) {
 }
 
 export async function getTokenSymbol(tokenAddress, provider) {
-
-	const contract = getContract(tokenAddress, ERC20_ABI, provider)
+	const TokenABIChange = await blockChainServer(provider);
+	const contract = getContract(tokenAddress, BEP20_ABI, provider)
 	try {
 		const tokenSymbol = await contract.symbol();
 		return tokenSymbol
@@ -54,7 +56,8 @@ export async function getTokenSymbol(tokenAddress, provider) {
 }
 
 export async function getTokenDecimal(tokenAddress, provider) {
-	const contract = getContract(tokenAddress, ERC20_ABI, provider)
+	const TokenABIChange = await blockChainServer(provider);
+	const contract = getContract(tokenAddress, TokenABIChange.tokenABI, provider)
 	try {
 		const tokenDecimal = await contract.decimals();
 		return tokenDecimal
@@ -124,27 +127,32 @@ export async function getTokenPairAllowance(tokenAddress1, tokenAddress2, provid
 async function blockChainServer(provider) {
 	let routerAddress = "";
 	let factoryAddress = "";
+	let tokenABI = ERC20_ABI;
 	const network = await provider.getNetwork();
 	const chainID = network.chainId;
 	switch (chainID) {
 		case 1: // Etheruem net
 			routerAddress = etherRouterContractV2;
 			factoryAddress = etherFactoryContractV2;
+			tokenABI = ERC20_ABI;
 			break;
 
 		case 5: // goerli net
 			routerAddress = etherRouterContractV2;
 			factoryAddress = etherFactoryContractV2;
+			tokenABI = ERC20_ABI;
 			break;
 
 		case 56: // Binance net
 			routerAddress = binanceRouterContractV2;
 			factoryAddress = binanceFactoryContractV2;
+			tokenABI = BEP20_ABI;
 			break;
 
 		case 97: //Binance Testnet
 			routerAddress = binanceTestRouterContractV2;
 			factoryAddress = binanceTestFactoryContractV2;
+			tokenABI = BEP20_ABI;
 			break;
 
 		default:
@@ -154,6 +162,7 @@ async function blockChainServer(provider) {
 
 	return {
 		routerAddress: routerAddress,
-		factoryAddress: factoryAddress
+		factoryAddress: factoryAddress,
+		tokenABI: tokenABI
 	}
 }

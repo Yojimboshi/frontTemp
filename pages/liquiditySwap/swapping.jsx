@@ -20,6 +20,7 @@ const Swapping = () => {
   const [token1Balance, setToken1Balance] = useState("");
   const [token2Balance, setToken2Balance] = useState("");
   const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption2, setSelectedOption2] = useState('');
   const [priceImpact, setPriceImpact] = useState("");
   const [chainId, setchainId] = useState("");
   const { provider, defaultAccount } = SetupSwapPool();
@@ -118,8 +119,13 @@ const Swapping = () => {
 
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
+    setTokenAddress1(event.target.value)
   };
 
+  const handleOption2Change = (event) => {
+    setSelectedOption2(event.target.value);
+    setTokenAddress2(event.target.value)
+  };
   return (
     <div className="mt-16 ml-64">
 
@@ -137,6 +143,9 @@ const Swapping = () => {
               value={selectedOption}
               onChange={handleOptionChange}
             >
+              <option disabled value="">
+                Select an option
+              </option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -173,9 +182,12 @@ const Swapping = () => {
             </h1>
             <select
               id="optionDropdown"
-              value={selectedOption}
-              onChange={handleOptionChange}
+              value={selectedOption2}
+              onChange={handleOption2Change}
             >
+              <option disabled value="">
+                Select an option
+              </option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
