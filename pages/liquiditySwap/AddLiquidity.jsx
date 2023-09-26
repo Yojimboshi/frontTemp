@@ -17,8 +17,6 @@ const LiquidityPool = () => {
   const [tokenQuote2, setTokenQuote2] = useState(null);
   const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
   const [prevTokenAmount2, setPrevTokenAmount2] = useState("");
-  const [buttonText, setButtonText] = useState('Insert Token Pair');
-  const [buttonDisabled, setButtonDisabled] = useState(true);
   const [tokenSymbol1, setTokenSymbol1] = useState("");
   const [tokenSymbol2, setTokenSymbol2] = useState("");
   const [token1Balance, setToken1Balance] = useState("");
@@ -134,7 +132,6 @@ const LiquidityPool = () => {
           serializedToken: serializedTokenData,
         }));
       }
-
     } catch (error) {
       return;
     }
@@ -164,23 +161,6 @@ const LiquidityPool = () => {
 
   const handleToken1AmountChange = async (event) => {
     setTokenAmount1(event.target.value);
-    if (tokenPairState == false) {
-      console.log(tokenPairState)
-      setButtonText("Insert Token Pair")
-    } else {
-      setTimeout(() => 5000);
-      setButtonText("Enter Liquidity Amount")
-    }
-
-    if (tokenAmount1 != "") {
-      setButtonDisabled(false)
-      const tokenAllowance = await getTokenAllowance(defaultAccount, tokenAddress1, provider);
-      if (tokenAmount1 >= tokenAllowance) {
-        setButtonText('Approve')
-      } else {
-        setButtonText("Add Liquidity")
-      }
-    }
   };
 
   const handleToken2AmountChange = (event) => {
@@ -339,11 +319,9 @@ const LiquidityPool = () => {
         </h1>}
       </div>
       <div>
-        <button className={`bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3 
-        ${buttonDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : ''}`}
-          disabled={buttonDisabled}
+        <button className={`bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3`}
           onClick={AddLiquidity}>
-          {buttonText}
+          Add Liquidity
         </button>
       </div>
     </div>
