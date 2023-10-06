@@ -90,7 +90,13 @@ export default function Header04() {
         name: "Crypto Trading",
         condition: true,
         path: "/home/home_11",
-      }
+      },
+      {
+        id: uuidv4(),
+        name: "LiquiditySwap",
+        condition: true,
+        path: "/home/liquiditySwap",
+      },
     ],
   };
 
