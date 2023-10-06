@@ -1,95 +1,78 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { buyModalHide } from "../../redux/counterSlice";
-import { ethers } from 'ethers';
+import { bidsModalHide } from "../../redux/counterSlice";
+import contractAbi from '../../data/abi/nftMintAbi.json';
+import { nftContractAddress, providerURL } from '../../config/setting';
+import { ethers, providers } from 'ethers';
 import { useWallet } from "../../context/walletContext";
-import { nftContractAddress } from '../../config/setting';
-import nftBuySell from '../../data/abi/nftMintAbi.json';
+import useNftBuySell from '../../components/nftBuySell/nftBuySell';
+import txUpdateDisplay from '../../utils/txUpdateDisplay';
 
-const BuyModal = () => {
-  const pid = useSelector(state => state.counter.pid);
-  const { account } = useWallet();
-  const [localBalance] = useState(localStorage.getItem('accountBalance'));
-  const { buyModal } = useSelector((state) => state.counter);
+const BidsModal = () => {
+  const { account, balance } = useWallet();
+  const [localBalance, setLocalBalance] = useState('');
+  const [isWalletInitialized, setIsWalletInitialized] = useState(false);
+  const [payAmount, setPayAmount] = useState("");
+  const { bidsModal } = useSelector((state) => state.counter);
   const dispatch = useDispatch();
-  const [payAmount, setPayAmount] = useState(pid?.price||'');
-  const [ethToUsdRate, setEthToUsdRate] = useState(0);
-  const [isTransactionPending, setIsTransactionPending] = useState(false);
-  console.log("Buy Modal Running");
 
+  const pid = useSelector(state => state.counter.pid);
+
+  const nftBuySellHooks = useNftBuySell();
+  const { buy } = isWalletInitialized ? nftBuySellHooks : {};
+  
   useEffect(() => {
-    console.log("Bid Modal UseEffect#1 running....");
-    async function fetchEthToUsdRate() {
-      try {
-        const response = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
-        );
-        const data = await response.json();
-  
-        if (data.ethereum && data.ethereum.usd) {
-          setEthToUsdRate(data.ethereum.usd);
-        } else {
-          console.error("Unable to fetch exchange rate data.");
-        }
-      } catch (error) {
-        console.error("An error occurred while fetching exchange rate data.");
-      }
+    const storedBalance = localStorage.getItem('accountBalance');
+    if (storedBalance) {
+      setLocalBalance(storedBalance);
     }
-  
-    // Call the fetchEthToUsdRate function to fetch and update the exchange rate.
-    fetchEthToUsdRate();
-  },[]); // Include pid and payAmount as dependencies
 
-  const buyNFT = async () => {
-    if (payAmount === "") {
-      alert("Please enter a valid amount before buying.");
+    if (account && balance) {
+      setIsWalletInitialized(true);
+      console.log("Wallet Initialized");
+    }
+  }, [account, balance]);
+
+  const buyAction = async () => {
+
+    if (!buy) {
+      console.error("buy function is not initialized yet.");
       return;
     }
-  
-    try {
-      if (window.ethereum && account) {
-        setIsTransactionPending(true);
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const nftContract = new ethers.Contract(nftContractAddress, nftBuySell, signer);
-  
-        // Rest of your code for buying NFT
-        const tokenId = pid.pid;
-        const price = payAmount;
-        const priceInWei = ethers.utils.parseEther(price.toString());
-  
-        const tx = await nftContract.buyNFT(tokenId, {
-          value: priceInWei,
-        });
-  
-        await tx.wait();
-  
-        console.log("NFT purchased successfully!");
-        dispatch(buyModalHide());
-        window.location.reload(); // This will refresh the page
-      } else {
-        console.error("MetaMask extension not found or account not connected.");
-      }
-    } catch (error) {
-      console.error("Error buying NFT:", error);
-    } finally{
-      setIsTransactionPending(false);
+    if (!payAmount) {
+      console.error("Parsed payAmount is undefined.");
+      return;
     }
-  };
-  
+    
+    try{
+      if(isWalletInitialized){
+        const parsedPayAmount = ethers.utils.parseUnits(payAmount);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await nftBuySellHooks.buy(pid, payAmount);
+        console.log(typeof(payAmount));
+        console.log('success');
+      }else{
+        console.error('wallet not initialized.');
+      }
+    }catch(error){
+
+      console.error(error);
+    }
+  }
+
   return (
     <div>
-      <div className={buyModal ? "modal fade show block" : "modal fade"}>
+      <div className={bidsModal ? "modal fade show block" : "modal fade"}>
         <div className="modal-dialog max-w-2xl">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="placeBidLabel">
-                Buy NFT
+                Place a bid
               </h5>
               <button
                 type="button"
                 className="btn-close"
-                onClick={() => dispatch(buyModalHide())}
+                onClick={() => dispatch(bidsModalHide())}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -129,18 +112,12 @@ const BuyModal = () => {
                   className="focus:ring-accent h-12 w-full flex-[3] border-0 focus:ring-inse dark:text-jacarta-700"
                   placeholder={pid?.price || ''}
                   value={payAmount}
-                  // onChange={(e) => setPayAmount(e.target.value)}
-                  onChange={(e)=>{
-                    const newValue = e.target.value;
-                    setPayAmount(newValue);
-                  }}
+                  onChange={(e) => setPayAmount(e.target.value)}
                 />
 
                 <div className="bg-jacarta-50 border-jacarta-100 flex flex-1 justify-end self-stretch border-l dark:text-jacarta-700">
-                    <span className="self-center px-2 text-sm">
-                      ${(payAmount * ethToUsdRate).toFixed(2)}
-                    </span>
-                  </div>
+                  <span className="self-center px-2 text-sm">$130.82</span>
+                </div>
               </div>
 
               <div className="text-right">
@@ -149,6 +126,23 @@ const BuyModal = () => {
                 </span>
               </div>
 
+              {/* <!-- Terms --> */}
+              <div className="mt-4 flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  className="checked:bg-accent dark:bg-jacarta-600 text-accent border-jacarta-200 focus:ring-accent/20 dark:border-jacarta-500 h-5 w-5 self-start rounded focus:ring-offset-0"
+                />
+                <label
+                  htmlFor="terms"
+                  className="dark:text-jacarta-200 text-sm"
+                >
+                  By checking this box, I agree to {"Xhibiter's"}{" "}
+                  <a href="#" className="text-accent">
+                    Terms of Service
+                  </a>
+                </label>
+              </div>
             </div>
             {/* <!-- end body --> */}
 
@@ -157,10 +151,9 @@ const BuyModal = () => {
                 <button
                   type="button"
                   className="bg-accent shadow-accent-volume hover:bg-accent-dark rounded-full py-3 px-8 text-center font-semibold text-white transition-all"
-                  onClick={buyNFT}
-                  disabled={isTransactionPending}
+                  onClick={buyAction}
                 >
-                  {isTransactionPending ? "Processing....": "Buy"}
+                  Buy
                 </button>
               </div>
             </div>
@@ -171,4 +164,4 @@ const BuyModal = () => {
   );
 };
 
-export default BuyModal;
+export default BidsModal;

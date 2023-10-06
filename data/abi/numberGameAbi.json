@@ -7,23 +7,54 @@
     "type": "constructor"
   },
   {
-    "inputs": [],
-    "name": "currentPlayer",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "gameId",
+        "type": "uint256"
+      }
+    ],
+    "name": "GameCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "gameId",
+        "type": "uint16"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "playerAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "opponentAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Withdrawn",
+    "type": "event"
   },
   {
     "inputs": [],
-    "name": "currentState",
-    "outputs": [
-      {
-        "internalType": "enum NumberGame.GameState",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "createGame",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -34,31 +65,48 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "p1Guess", "type": "uint256" },
-      { "internalType": "uint256", "name": "p2Guess", "type": "uint256" }
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "games",
+    "outputs": [
+      {
+        "internalType": "address payable",
+        "name": "player1",
+        "type": "address"
+      },
+      {
+        "internalType": "address payable",
+        "name": "player2",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "player1Bet", "type": "uint256" },
+      { "internalType": "uint256", "name": "player2Bet", "type": "uint256" },
+      { "internalType": "uint256", "name": "minimumBet", "type": "uint256" },
+      { "internalType": "uint8", "name": "player1Guess", "type": "uint8" },
+      { "internalType": "uint8", "name": "player2Guess", "type": "uint8" },
+      {
+        "internalType": "enum NumberGame.GameState",
+        "name": "currentState",
+        "type": "uint8"
+      },
+      { "internalType": "bool", "name": "p1BetStatus", "type": "bool" },
+      { "internalType": "bool", "name": "p2BetStatus", "type": "bool" }
     ],
-    "name": "finalizeGame",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "gameEnded",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      { "internalType": "uint16", "name": "gameId", "type": "uint16" }
+    ],
     "name": "getTargetNumber",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      { "internalType": "uint16", "name": "gameId", "type": "uint16" }
+    ],
     "name": "joinGame",
     "outputs": [],
     "stateMutability": "payable",
@@ -66,7 +114,8 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "guessNumber", "type": "uint256" }
+      { "internalType": "uint16", "name": "gameId", "type": "uint16" },
+      { "internalType": "uint8", "name": "guessNumber", "type": "uint8" }
     ],
     "name": "makeGuess",
     "outputs": [],
@@ -75,7 +124,7 @@
   },
   {
     "inputs": [],
-    "name": "minimumBet",
+    "name": "nextGameId",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
@@ -90,78 +139,47 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "p1BetStatus",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "p2BetStatus",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "player1",
-    "outputs": [
-      { "internalType": "address payable", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "player1Bet",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "player2",
-    "outputs": [
-      { "internalType": "address payable", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "player2Bet",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
-      { "internalType": "uint256", "name": "newMinimumBet", "type": "uint256" }
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    "name": "setMinimumBet",
+    "name": "ownerWithdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "newTargetNumber",
-        "type": "uint256"
-      }
+      { "internalType": "uint16", "name": "gameId", "type": "uint16" }
     ],
-    "name": "setTargetNumber",
+    "name": "resetGame",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint16", "name": "_nextGameId", "type": "uint16" }
+    ],
+    "name": "setNextGameId",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
+    "name": "unclaimedBalance",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint16", "name": "gameId", "type": "uint16" }
+    ],
     "name": "withdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  }
+  },
+  { "stateMutability": "payable", "type": "receive" }
 ]
