@@ -1,3 +1,5 @@
+// useTokenContract.js
+
 import { getContract } from "../hooks/useContracts";
 import ERC20_ABI from "../data/abi/erc20.json";
 import BEP20_ABI from "../data/abi/bep20.json";

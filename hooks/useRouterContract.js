@@ -1,3 +1,4 @@
+// useRouterContract.js
 import { getContract } from "../hooks/useContracts";
 import uniSwapRouter_ABI from "../data/abi/uniswapRouter";
 import { ethers } from "ethers";
@@ -9,7 +10,7 @@ import {
 } from "./useTokenContract";
 import {etherRouterContractV2,etherFactoryContractV2,binanceTestFactoryContractV2,binanceTestRouterContractV2,binanceFactoryContractV2,binanceRouterContractV2
 } from "../config/setting";
-
+import { toast } from 'react-toastify';
 
 const Fee = 0.003;
 export async function useAddLiquidity(
@@ -21,6 +22,7 @@ export async function useAddLiquidity(
 	provider,
 	tokenReserve
 ) {
+	try {
 	const contractAddress = await blockChainServer(provider);
 	let amountOutMinToken1 = 0;
 	let amountOutMinToken2 = 0;
@@ -77,7 +79,14 @@ export async function useAddLiquidity(
 		);
 		return
 	}
-
+} catch (error) {
+ if (error.code === 'ACTION_REJECTED') {
+            toast.error("Transaction was rejected by the user.");
+        } else {
+            // Handle any other errors or show a generic error message
+            toast.error("An error occurred. Please try again.");
+        }
+    }
 }
 
 export async function performTrade(

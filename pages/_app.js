@@ -1,3 +1,4 @@
+// _app.js
 import "../styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import Layout from "../components/layout";
@@ -8,12 +9,13 @@ import { MetaMaskProvider } from "metamask-react";
 import Meta from "../components/Meta";
 import UserContext from "../components/UserContext";
 import { WalletProvider } from "../context/walletContext";
-
+import 'react-toastify/dist/ReactToastify.css';
 import { useRef } from "react";
+import { ToastContainer } from 'react-toastify';
 
-if (typeof window !== "undefined") {
-  require("bootstrap/dist/js/bootstrap");
-}
+// if (typeof window !== "undefined") {
+//   require("bootstrap/dist/js/bootstrap");
+// }
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -29,19 +31,21 @@ function MyApp({ Component, pageProps }) {
       <Provider store={store}>
         <ThemeProvider enableSystem={true} attribute="class">
           <MetaMaskProvider>
-          <WalletProvider>
-            <UserContext.Provider value={{ scrollRef: scrollRef }}>
-              {pid === "/login" ? (
-                <Component {...pageProps} />
-              ) : (
-                <Layout>
+            <WalletProvider>
+              <UserContext.Provider value={{ scrollRef: scrollRef }}>
+                {pid === "/login" ? (
                   <Component {...pageProps} />
-                </Layout>
-              )}
-            </UserContext.Provider>
+                ) : (
+                  <Layout>
+                    <Component {...pageProps} />
+                  </Layout>
+                )}
+              </UserContext.Provider>
             </WalletProvider>
           </MetaMaskProvider>
         </ThemeProvider>
+
+        <ToastContainer />
       </Provider>
     </>
   );

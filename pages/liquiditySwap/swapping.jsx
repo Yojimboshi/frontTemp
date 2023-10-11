@@ -5,6 +5,8 @@ import { performTrade } from "../../hooks/useRouterContract";
 import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
 import { getPriceImpact } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 import { useSelector } from "react-redux";
+import { utils } from 'ethers';
+
 const Swapping = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
   const [tokenAddress2, setTokenAddress2] = useState("");
@@ -43,7 +45,10 @@ const Swapping = () => {
       setPrevTokenAmount2
     });
     getChainId()
-    if (tokenAddress1 != "" && tokenAddress2 != "") {
+    if (
+      utils.isAddress(tokenAddress1) &&
+      utils.isAddress(tokenAddress2) &&
+      tokenAddress1 !== tokenAddress2) {
       getTokenSymbols();
       getTokenBalances();
       getPriceImpactforDisplay();
