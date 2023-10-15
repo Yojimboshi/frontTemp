@@ -97,6 +97,12 @@ const LiquidityPool = () => {
         value: address,
         label: tokensByChainId[chainId][address].symbol,
     }));
+    const filteredInitialTokens = initialTokens.filter((token) => token.chainId == chainId);
+
+    const optionsWithInitialTokens = options.concat(filteredInitialTokens.map((token) => ({
+        value: token.address,
+        label: token.symbol,
+    })));
 
     async function getPoolShare() {
         const userPoolShare = await getPoolShareandUserBalance(tokenAddress1, tokenAddress2, provider, defaultAccount);

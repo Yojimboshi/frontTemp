@@ -36,44 +36,53 @@ const LiquidityPool = () => {
     const dispatch = useDispatch();
     const tokensByChainId = useSelector((state) => state.user.tokens);
     useEffect(() => {
-        setupLiquidityPool({
-            tokenAddress1,
-            tokenAddress2,
-            tokenAmount1,
-            tokenAmount2,
-            provider,
-            tokenReserve,
-            prevTokenAmount1,
-            prevTokenAmount2,
-            setTokenReserve,
-            setTokenQuote1,
-            setTokenQuote2,
-            setPrevTokenAmount1,
-            setPrevTokenAmount2,
-            setTokenPairAvailable
-        });
-        getChainId();
+        const debounceTimer = setTimeout(() => {
+            console.log("useEffect #1 running...")
+            console.log(tokenAddress2);
+            setupLiquidityPool({
+                tokenAddress1,
+                tokenAddress2,
+                tokenAmount1,
+                tokenAmount2,
+                provider,
+                tokenReserve,
+                prevTokenAmount1,
+                prevTokenAmount2,
+                setTokenReserve,
+                setTokenQuote1,
+                setTokenQuote2,
+                setPrevTokenAmount1,
+                setPrevTokenAmount2,
+                setTokenPairAvailable
+            });
+            getChainId();
+        }, 1000);
+        console.log(tokenPairAvailable)
+        return () => clearTimeout(debounceTimer);  // Clear the timer on component unmount
     }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
     useEffect(() => {
-        if (
-            utils.isAddress(tokenAddress1) &&
-            utils.isAddress(tokenAddress2) &&
-            tokenAddress1 !== tokenAddress2) {
-            getLiquidityBalance();
-            getPoolShare();
-            getTokenSymbols();
-            getTokenBalances();
-        } else {
-            console.log("Invalid addresses provided.");
-        }
+        const debounceTimer = setTimeout(() => {
+            console.log("useEffect #2 running...")
+            console.log(tokenAddress1, tokenAddress2, tokenReserve)
+            if (
+                utils.isAddress(tokenAddress1) &&
+                utils.isAddress(tokenAddress2) &&
+                tokenAddress1 !== tokenAddress2) {
+                getLiquidityBalance();
+                getPoolShare();
+                getTokenSymbols();
+                getTokenBalances();
+            } else {
+                console.log("Invalid addresses provided.");
+            }
+        }, 1000);
+
+        return () => clearTimeout(debounceTimer);  // Clear the timer on component unmount
     }, [tokenPairAvailable]);
 
 
     async function AddLiquidity() {
-        console.log("tokenAmount1", tokenAmount1);
-        console.log("tokenAmount2", tokenQuote2);
-        console.log("tokenReserve", tokenReserve);
         if (!isNaN(parseFloat(tokenAmount1)) && !isNaN(parseFloat(tokenQuote2))) {
             useAddLiquidity(tokenAddress1, tokenAddress2, tokenAmount1, tokenQuote2, defaultAccount, provider, tokenReserve);
         } else {
@@ -124,6 +133,14 @@ const LiquidityPool = () => {
         value: address,
         label: tokensByChainId[chainId][address].symbol,
     }));
+
+    const filteredInitialTokens = initialTokens.filter((token) => token.chainId == chainId);
+
+    const optionsWithInitialTokens = options.concat(filteredInitialTokens.map((token) => ({
+        value: token.address,
+        label: token.symbol,
+    })));
+
 
     {/*<---- Interface Handler ----> */ }
 
@@ -222,7 +239,7 @@ const LiquidityPool = () => {
                             <option disabled value="">
                                 Select an option
                             </option>
-                            {options.map((option) => (
+                            {optionsWithInitialTokens.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
@@ -273,7 +290,7 @@ const LiquidityPool = () => {
                             <option disabled value="">
                                 Select an option
                             </option>
-                            {options.map((option) => (
+                            {optionsWithInitialTokens.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>

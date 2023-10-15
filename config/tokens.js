@@ -7,7 +7,7 @@ const initialTokens = [
     {
         symbol: 'WETH',
         address: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-        chainId: 7,
+        chainId: 5,
     },
     {
         symbol: 'wBETH',
