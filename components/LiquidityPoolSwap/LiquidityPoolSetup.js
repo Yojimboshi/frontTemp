@@ -22,15 +22,14 @@ export const setupLiquidityPool = async (args) => {
   try {
     if (tokenAddress1 && tokenAddress2) {
       const liquidityPoolAddress = await FactoryContract.getPair(tokenAddress1, tokenAddress2);
+      console.log(liquidityPoolAddress);
       if (liquidityPoolAddress && liquidityPoolAddress !== ZERO_ADDRESS) {
         const LiquidityPoolContract = getContract(liquidityPoolAddress, UniPairABI, provider);
         const reservesss = await LiquidityPoolContract.getReserves();
-        setTokenPairAvailable(true);
+        setTokenPairAvailable("1");
         if (reservesss[0].toString() != 0 && reservesss[1].toString() != 0) {
           setTokenReserve(reservesss);
         }
-      } else {
-        setTokenReserve("", "");
       }
 
       if (typeof tokenReserve[0] !== 'undefined' && typeof tokenReserve[1] !== 'undefined') {
@@ -63,7 +62,8 @@ export const setupLiquidityPool = async (args) => {
       }
     }
   }catch(error){
-    setTokenPairAvailable(false);
+    setTokenPairAvailable("0");
+    setTokenReserve("", "");
   }
 
 

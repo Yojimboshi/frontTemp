@@ -26,7 +26,7 @@ const Swapping = () => {
   const [selectedOption2, setSelectedOption2] = useState('');
   const [priceImpact, setPriceImpact] = useState("");
   const [chainId, setchainId] = useState("");
-  const [tokenPairAvailable, setTokenPairAvailable] = useState(false);
+  const [tokenPairAvailable, setTokenPairAvailable] = useState("");
   const { provider, defaultAccount } = SetupSwapPool();
   const tokensByChainId = useSelector((state) => state.user.tokens);
 
@@ -48,6 +48,8 @@ const Swapping = () => {
       setTokenPairAvailable
     });
     getChainId()
+    console.log(tokenPairAvailable);
+    console.log(tokenSymbol1);
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
   useEffect(() => {
@@ -58,8 +60,14 @@ const Swapping = () => {
       getTokenSymbols();
       getTokenBalances();
       getPriceImpactforDisplay();
+    }else{
+      setTokenSymbol1("")
+      setTokenSymbol2("")
+      setToken1Balance("")
+      setToken2Balance("")
+      setPriceImpact("");
     }
-  }, [setTokenPairAvailable]);
+  }, [tokenPairAvailable]);
 
 
   async function getTokenSymbols() {
@@ -80,7 +88,7 @@ const Swapping = () => {
       setToken1Balance(t1balance)
       setToken2Balance(t2balance)
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -111,7 +119,7 @@ const Swapping = () => {
   {/*<---- Interface Handler ----> */ }
 
   const swapToken = async () => {
-    if (!isNaN(liquidityPercentage)) {
+    if (!isNaN(tokenAmount1)) {
       performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
     }
 
@@ -242,7 +250,7 @@ const Swapping = () => {
             }
           >
             <h1>
-              1 {tokenSymbol1}  = {(tokenAmount1 / tokenQuote2).toFixed(5)} {tokenSymbol2}
+              {tokenSymbol1}  = {(tokenAmount1 / tokenQuote2).toFixed(5)} {tokenSymbol2}
             </h1>
             <h1>
               Price Impact: {priceImpact}
