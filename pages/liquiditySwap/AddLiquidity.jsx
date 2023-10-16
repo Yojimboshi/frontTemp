@@ -31,14 +31,14 @@ const LiquidityPool = () => {
     const [selectedOption, setSelectedOption] = useState('');
     const [selectedOption2, setSelectedOption2] = useState('');
     const [chainId, setchainId] = useState("");
-    const [tokenPairAvailable, setTokenPairAvailable] = useState(false);
+    const [tokenPairAvailable, setTokenPairAvailable] = useState("");
     const { provider, defaultAccount } = SetupSwapPool();
     const dispatch = useDispatch();
     const tokensByChainId = useSelector((state) => state.user.tokens);
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
             console.log("useEffect #1 running...")
-            console.log(tokenAddress2);
+            console.log(tokenReserve);
             setupLiquidityPool({
                 tokenAddress1,
                 tokenAddress2,
@@ -74,7 +74,12 @@ const LiquidityPool = () => {
                 getTokenSymbols();
                 getTokenBalances();
             } else {
-                console.log("Invalid addresses provided.");
+                setTokenSymbol1("")
+                setTokenSymbol2("")
+                setToken1Balance("")
+                setToken2Balance("")
+                setUserPoolShare("")
+                setLiquidityTokenBalance("")
             }
         }, 1000);
 

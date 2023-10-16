@@ -27,7 +27,7 @@ const LiquidityPool = () => {
     const [liquidityRemoveTokenBalance, setLiquidityRemoveTokenBalance] = useState("");
     const [userPoolShare, setUserPoolShare] = useState("");
     const [chainId, setchainId] = useState("");
-    const [tokenPairAvailable, setTokenPairAvailable] = useState(false);
+    const [tokenPairAvailable, setTokenPairAvailable] = useState("");
     const { provider, defaultAccount } = SetupSwapPool();
     const tokensByChainId = useSelector((state) => state.user.tokens);
     // First useEffect: Handles the initial setup
@@ -58,6 +58,12 @@ const LiquidityPool = () => {
             getPoolShare();
             getTokenSymbols();
             getRemovedLiquidityBalance();
+        }else{
+            setTokenSymbol1("")
+            setTokenSymbol2("")
+            setLiquidityTokenBalance("");
+            setLiquidityRemoveTokenBalance("");
+            setUserPoolShare("");
         }
     }, [tokenPairAvailable]);
 
