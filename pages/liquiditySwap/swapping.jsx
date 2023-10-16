@@ -6,6 +6,7 @@ import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../ho
 import { getPriceImpact } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 import { useSelector } from "react-redux";
 import { utils } from 'ethers';
+import { initialTokens } from '../../config/tokens';
 
 const Swapping = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");

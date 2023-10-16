@@ -6,6 +6,7 @@ import { getTokenSymbol } from "../../hooks/useTokenContract";
 import { getTokenLiquidityBalance, getPoolShareandUserBalance, getRemoveTokenLiquidityBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 import { useSelector } from "react-redux";
 import { utils } from 'ethers';
+import { initialTokens } from '../../config/tokens';
 
 const LiquidityPool = () => {
     const [tokenAddress1, setTokenAddress1] = useState("");
