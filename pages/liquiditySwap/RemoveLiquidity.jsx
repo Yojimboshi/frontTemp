@@ -155,7 +155,7 @@ const LiquidityPool = () => {
                             <option disabled value="">
                                 Select an option
                             </option>
-                            {options.map((option) => (
+                            {optionsWithInitialTokens.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
@@ -180,7 +180,7 @@ const LiquidityPool = () => {
                             <option disabled value="">
                                 Select an option
                             </option>
-                            {options.map((option) => (
+                            {optionsWithInitialTokens.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
