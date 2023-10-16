@@ -19,10 +19,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     addSerializedToken: function(state, action) {
-      const serializedToken = action.payload.serializedToken;
-      if (!state.tokens) {
-        state.tokens = {};
-      }
+      const serializedToken = action.payload;
       state.tokens[serializedToken.chainId] = state.tokens[serializedToken.chainId] || {};
       state.tokens[serializedToken.chainId][serializedToken.address] = serializedToken;
       state.timestamp = currentTimestamp();

@@ -1,3 +1,4 @@
+// redux/counterSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -37,8 +38,8 @@ export const counterSlice = createSlice({
     closeDropdown: (state) => {
       state.dropdown = false;
     },
-    handle_collection_activity_item_data: (state, payload) => {
-      state.collection_activity_item_data = payload.data;
+    handle_collection_activity_item_data: (state, action) => {
+      state.collection_activity_item_data = action.payload.data;
     },
     walletModalShow: (state) => {
       state.walletModal = true;
@@ -48,15 +49,15 @@ export const counterSlice = createSlice({
     },
     sellModalShow: (state, action) => {
       state.sellModal = true;
-      state.pid = { pid: action.payload.pid }; // This sets the pid property only
+      state.pid = action.payload.pid;
     },
     sellModalHide: (state) => {
       state.sellModal = false;
     },
-    buyModalShow: (state,action) => {
+    buyModalShow: (state, action) => {
       state.buyModal = true;
-      state.pid = action.payload;
-      state.price = action.payload;
+      state.pid = action.payload.pid;
+      state.price = action.payload.price;
     },
     profileModalShow: (state) => {
       state.profileModal = true;
@@ -84,7 +85,7 @@ export const counterSlice = createSlice({
           state.trendingCategoryItemData.sort(
             (a, b) => a.sortPrice - b.sortPrice
           );
-      } else if (sortText === "Price: high to low") {
+      } else if (sortText === "Price: High to Low") {
         state.sortedtrendingCategoryItemData =
           state.trendingCategoryItemData.sort(
             (a, b) => b.sortPrice - a.sortPrice
@@ -127,7 +128,6 @@ export const counterSlice = createSlice({
     },
     updateCollectionData: (state, action) => {
       const text = action.payload;
-      console.log(text);
       if (text === "trending") {
         const tampItem = state.collectiondata.filter((item) => item.trending);
         state.sortedCollectionData = tampItem;

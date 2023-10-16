@@ -18,8 +18,8 @@ const LiquidityPool = () => {
     const [tokenAmount1, setTokenAmount1] = useState("");
     const [tokenAmount2, setTokenAmount2] = useState("");
     const [tokenReserve, setTokenReserve] = useState([]);
-    const [tokenQuote1, setTokenQuote1] = useState(null);
-    const [tokenQuote2, setTokenQuote2] = useState(null);
+    const [tokenQuote1, setTokenQuote1] = useState("");
+    const [tokenQuote2, setTokenQuote2] = useState("");
     const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
     const [prevTokenAmount2, setPrevTokenAmount2] = useState("");
     const [tokenSymbol1, setTokenSymbol1] = useState("");
