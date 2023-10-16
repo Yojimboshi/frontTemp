@@ -15,7 +15,7 @@ const LiquidityPool = () => {
     const [prevTokenAmount1, setPrevTokenAmount1] = useState("");
     const [prevTokenAmount2, setPrevTokenAmount2] = useState("");
     const [tokenQuote1, setTokenQuote1] = useState(null);
-    const [tokenQuote2, setTokenQuote2] = useState(null);;
+    const [tokenQuote2, setTokenQuote2] = useState(null);
     const [tokenSymbol1, setTokenSymbol1] = useState("");
     const [tokenSymbol2, setTokenSymbol2] = useState("");
     const [selectedOption, setSelectedOption] = useState('');
@@ -24,6 +24,7 @@ const LiquidityPool = () => {
     const [liquidityRemoveTokenBalance, setLiquidityRemoveTokenBalance] = useState("");
     const [userPoolShare, setUserPoolShare] = useState("");
     const [chainId, setchainId] = useState("");
+    const [tokenPairAvailable, setTokenPairAvailable] = useState(false);
     const { provider, defaultAccount } = SetupSwapPool();
     const tokensByChainId = useSelector((state) => state.user.tokens);
     // First useEffect: Handles the initial setup
@@ -39,7 +40,8 @@ const LiquidityPool = () => {
             setTokenQuote1,
             setTokenQuote2,
             setPrevTokenAmount1,
-            setPrevTokenAmount2
+            setPrevTokenAmount2,
+            setTokenPairAvailable,
         });
         getChainId();
     }, [tokenAddress1, tokenAddress2]);
@@ -54,10 +56,10 @@ const LiquidityPool = () => {
             getTokenSymbols();
             getRemovedLiquidityBalance();
         }
-    }, [tokenAddress1, tokenAddress2, liquidityPercentage]);
+    }, [tokenPairAvailable]);
 
     async function RemoveLiquidity() {
-        if (!isNaN(tokenAmount1)) {
+        if (!isNaN(liquidityPercentage)) {
             useRemoveLiquidity(tokenAddress1, tokenAddress2, liquidityPercentage, defaultAccount, provider, tokenReserve)
         }
     }
@@ -95,6 +97,12 @@ const LiquidityPool = () => {
         value: address,
         label: tokensByChainId[chainId][address].symbol,
     }));
+    const filteredInitialTokens = initialTokens.filter((token) => token.chainId == chainId);
+
+    const optionsWithInitialTokens = options.concat(filteredInitialTokens.map((token) => ({
+        value: token.address,
+        label: token.symbol,
+    })));
 
     async function getPoolShare() {
         const userPoolShare = await getPoolShareandUserBalance(tokenAddress1, tokenAddress2, provider, defaultAccount);

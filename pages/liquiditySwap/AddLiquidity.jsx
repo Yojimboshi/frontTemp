@@ -10,6 +10,7 @@ import { addSerializedToken } from "../../redux/user/reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { utils } from 'ethers';
 import { toast } from 'react-toastify';
+import { initialTokens } from '../../config/tokens';
 
 const LiquidityPool = () => {
     const [tokenAddress1, setTokenAddress1] = useState("");
@@ -30,12 +31,14 @@ const LiquidityPool = () => {
     const [selectedOption, setSelectedOption] = useState('');
     const [selectedOption2, setSelectedOption2] = useState('');
     const [chainId, setchainId] = useState("");
+    const [tokenPairAvailable, setTokenPairAvailable] = useState(false);
     const { provider, defaultAccount } = SetupSwapPool();
     const dispatch = useDispatch();
     const tokensByChainId = useSelector((state) => state.user.tokens);
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
             console.log("useEffect #1 running...")
+            console.log(tokenAddress2);
             setupLiquidityPool({
                 tokenAddress1,
                 tokenAddress2,
@@ -49,11 +52,12 @@ const LiquidityPool = () => {
                 setTokenQuote1,
                 setTokenQuote2,
                 setPrevTokenAmount1,
-                setPrevTokenAmount2
+                setPrevTokenAmount2,
+                setTokenPairAvailable
             });
             getChainId();
         }, 1000);
-
+        console.log(tokenPairAvailable)
         return () => clearTimeout(debounceTimer);  // Clear the timer on component unmount
     }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
@@ -75,13 +79,10 @@ const LiquidityPool = () => {
         }, 1000);
 
         return () => clearTimeout(debounceTimer);  // Clear the timer on component unmount
-    }, [tokenAddress1, tokenAddress2, tokenReserve]);
+    }, [tokenPairAvailable]);
 
 
     async function AddLiquidity() {
-        console.log("tokenAmount1", tokenAmount1);
-        console.log("tokenAmount2", tokenQuote2);
-        console.log("tokenReserve", tokenReserve);
         if (!isNaN(parseFloat(tokenAmount1)) && !isNaN(parseFloat(tokenQuote2))) {
             useAddLiquidity(tokenAddress1, tokenAddress2, tokenAmount1, tokenQuote2, defaultAccount, provider, tokenReserve);
         } else {
@@ -132,6 +133,14 @@ const LiquidityPool = () => {
         value: address,
         label: tokensByChainId[chainId][address].symbol,
     }));
+
+    const filteredInitialTokens = initialTokens.filter((token) => token.chainId == chainId);
+
+    const optionsWithInitialTokens = options.concat(filteredInitialTokens.map((token) => ({
+        value: token.address,
+        label: token.symbol,
+    })));
+
 
     {/*<---- Interface Handler ----> */ }
 
@@ -230,7 +239,7 @@ const LiquidityPool = () => {
                             <option disabled value="">
                                 Select an option
                             </option>
-                            {options.map((option) => (
+                            {optionsWithInitialTokens.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
@@ -281,7 +290,7 @@ const LiquidityPool = () => {
                             <option disabled value="">
                                 Select an option
                             </option>
-                            {options.map((option) => (
+                            {optionsWithInitialTokens.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>

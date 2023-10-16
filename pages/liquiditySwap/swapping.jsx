@@ -25,6 +25,7 @@ const Swapping = () => {
   const [selectedOption2, setSelectedOption2] = useState('');
   const [priceImpact, setPriceImpact] = useState("");
   const [chainId, setchainId] = useState("");
+  const [tokenPairAvailable, setTokenPairAvailable] = useState(false);
   const { provider, defaultAccount } = SetupSwapPool();
   const tokensByChainId = useSelector((state) => state.user.tokens);
 
@@ -42,9 +43,13 @@ const Swapping = () => {
       setTokenQuote1,
       setTokenQuote2,
       setPrevTokenAmount1,
-      setPrevTokenAmount2
+      setPrevTokenAmount2,
+      setTokenPairAvailable
     });
     getChainId()
+  }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
+
+  useEffect(() => {
     if (
       utils.isAddress(tokenAddress1) &&
       utils.isAddress(tokenAddress2) &&
@@ -53,8 +58,7 @@ const Swapping = () => {
       getTokenBalances();
       getPriceImpactforDisplay();
     }
-
-  }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
+  }, [setTokenPairAvailable]);
 
 
   async function getTokenSymbols() {
@@ -91,6 +95,12 @@ const Swapping = () => {
     value: address,
     label: tokensByChainId[chainId][address].symbol,
   }));
+  const filteredInitialTokens = initialTokens.filter((token) => token.chainId == chainId);
+
+  const optionsWithInitialTokens = options.concat(filteredInitialTokens.map((token) => ({
+    value: token.address,
+    label: token.symbol,
+  })));
 
   async function getPriceImpactforDisplay() {
     const priceImpactAmount = await getPriceImpact(tokenAmount1, tokenAddress1, tokenAddress2, provider, tokenReserve)
@@ -100,7 +110,7 @@ const Swapping = () => {
   {/*<---- Interface Handler ----> */ }
 
   const swapToken = async () => {
-    if (!isNaN(tokenAmount1)) {
+    if (!isNaN(liquidityPercentage)) {
       performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
     }
 
