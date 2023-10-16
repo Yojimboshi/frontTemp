@@ -10,6 +10,16 @@ const initialTokens = [
         chainId: 5,
     },
     {
+        symbol: 'SPT',
+        address: '0xb38Bb8FEfCD7023B92CFe609b5B9760C1E11541b',
+        chainId: 5,
+    },
+    {
+        symbol: 'FETH',
+        address: '0x64B37e09d8ad93B4629fd3CB7103CDdEe63386ed',
+        chainId: 5,
+    },
+    {
         symbol: 'wBETH',
         address: '0xa2e3356610840701bdf5611a53974510ae27e2e1',
         chainId: 56,
