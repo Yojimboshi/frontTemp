@@ -7,6 +7,7 @@ import { getPriceImpact } from "../../components/LiquidityPoolSwap/LiquidityPool
 import { initialTokens } from '../../config/tokens';
 import { useSelector } from "react-redux";
 import { utils } from 'ethers';
+import { initialTokens } from '../../config/tokens';
 
 const Swapping = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");
@@ -162,7 +163,7 @@ const Swapping = () => {
               <option disabled value="">
                 Select an option
               </option>
-              {options.map((option) => (
+              {optionsWithInitialTokens.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -204,7 +205,7 @@ const Swapping = () => {
               <option disabled value="">
                 Select an option
               </option>
-              {options.map((option) => (
+              {optionsWithInitialTokens.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
