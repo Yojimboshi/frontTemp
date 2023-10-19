@@ -142,7 +142,7 @@ const NumberGame = () => {
   return (
     <>
       <Meta title={`Number Game || DEMO`} />
-      <section className="relative lg:mt-24 lg:pb-24 mt-24 pt-10 pb-24">
+      <section className="relative lg:pb-24 pb-24">
         <picture className="pointer-events-none absolute inset-0 -z-10 dark:hidden">
           <Image
             width={1518}

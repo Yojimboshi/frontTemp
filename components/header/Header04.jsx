@@ -75,9 +75,9 @@ export default function Header04() {
       // },
       {
         id: uuidv4(),
-        name: "NFT Game",
+        name: "NumberGameTab",
         condition: true,
-        path: "/home/number_game",
+        path: "/home/numberGamesTab",
       },
       {
         id: uuidv4(),
@@ -97,6 +97,7 @@ export default function Header04() {
         condition: true,
         path: "/home/liquiditySwap",
       },
+
     ],
   };
 

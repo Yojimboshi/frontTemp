@@ -12,8 +12,7 @@ export default function useNumberGame() {
         if (window.ethereum && account) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-            const createdContract = new ethers.Contract("0xF3d6e325CF53202d54fF941E4D0fC32733c708e1", numberGameAbi, signer);
-            console.log(account);
+            const createdContract = new ethers.Contract(numberGameAddress, numberGameAbi, signer);
             setContract(createdContract);
         } else {
             console.error('MetaMask extension not found or account not connected.');
@@ -91,7 +90,6 @@ export default function useNumberGame() {
                 activeGameIds[activeGameIds.length] = [minimumBet,i];
             }
         }
-        console.log(activeGameIds);
         return activeGameIds;
     }
     return { joinGame, guess, withdraw, createGame, availableGame, availableGameBasedOnPlayerAddress, getMinimumBetFromGameId };
