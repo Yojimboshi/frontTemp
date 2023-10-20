@@ -17,6 +17,9 @@ const NumberGame2 = () => {
   const [gamePlayed, setGamePlayed] = useState(false);
   const [playerJoinedGame, setPlayerJoinedGame] = useState([]);
   const [selectedPlayerJoinedGame, setSelectedPlayerJoinedGame] = useState('');
+  const [leftContent, setLeftContent] = useState("Left Container");
+  const [middleContent, setMiddleContent] = useState("Middle Container");
+  const [rightContent, setRightContent] = useState("Right Container");
 
   // Only invoke useNumberGame once the wallet is initialized.
   const numberGameHooks = useNumberofRisk();
@@ -129,6 +132,22 @@ const NumberGame2 = () => {
     setOpenReward(!openReward);
   };
 
+  const handleContainerClick = (container) => {
+    switch (container) {
+      case 'left':
+        setLeftContent("Left Container Clicked!");
+        break;
+      case 'middle':
+        setMiddleContent("Middle Container Clicked!");
+        break;
+      case 'right':
+        setRightContent("Right Container Clicked!");
+        break;
+      default:
+        break;
+    }
+  };
+
 
   return (
     <>
@@ -192,37 +211,24 @@ const NumberGame2 = () => {
 
           {openReward &&
             <div className="flex flex-col items-start">
-              <div className="grid grid-cols-3 dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white">
+              <div className="grid grid-cols-2 dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white">
 
                 <div className="p-4">Rounds</div>
-                <div className="p-4">Lose Chances and rewards</div>
-                <div className="p-4">Win Chances and rewards</div>
+                <div className="p-4">Chances to win</div>
                 <div className=" p-4">Round 1</div>
                 <div className=" p-4 whitespace-pre-line">
-                  20% = 0{'\n'}
-                  30% = x0.4 - x0.9{'\n'}
-                </div>
-                <div className=" p-4 whitespace-pre-line">
-                  40% = x1.0 - x1.5{'\n'}
-                  10% = x2.0 - x3.0
+                  Small win = x1.0 - x1.5{'\n'}
+                  Big win = x2.0 - x3.0
                 </div>
                 <div className=" p-4">Round 2</div>
                 <div className="p-4 whitespace-pre-line">
-                  30% = 0{'\n'}
-                  20% = x0.4 - x0.9{'\n'}
-                </div>
-                <div className="p-4 whitespace-pre-line">
-                  40% = x1.0 - x2.0{'\n'}
-                  10% = x1.0 - x2.8
+                  Small win = x1.0 - x2.0{'\n'}
+                  Big win = x1.0 - x2.8
                 </div>
                 <div className="p-4">Round 3</div>
                 <div className="p-4 whitespace-pre-line">
-                  40% = 0{'\n'}
-                  10% = x0.4 - x0.9{'\n'}
-                </div>
-                <div className="p-4 whitespace-pre-line">
-                  40% = x1.0 - x2.2{'\n'}
-                  10% = x1.0 - x3.0
+                  Small win = x1.0 - x2.2{'\n'}
+                  Big win = x1.0 - x3.0
                 </div>
 
               </div>
@@ -230,11 +236,28 @@ const NumberGame2 = () => {
           }
           {selectedPlayerJoinedGame &&
             <div className="items-center">
-
+              <div className="flex justify-between">
+                <div
+                  className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-lg border bg-white p-12 cursor-pointer"
+                  onClick={() => handleContainerClick('left')}
+                >
+                  {leftContent}
+                </div>
+                <div
+                  className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-lg border bg-white p-12 cursor-pointer"
+                  onClick={() => handleContainerClick('middle')}
+                >
+                  {middleContent}
+                </div>
+                <div
+                  className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-lg border bg-white p-12 cursor-pointer"
+                  onClick={() => handleContainerClick('right')}
+                >
+                  {rightContent}
+                </div>
+              </div>
 
               <div className="flex flex-col items-center">
-                <p1>Round :1</p1>
-                <p1>Total Reward = reward</p1>
                 <button
                   className=" bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
                   onClick={handlePlayGame}
