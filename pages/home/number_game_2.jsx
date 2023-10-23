@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ReactCardFlip from 'react-card-flip';
 import "tippy.js/dist/tippy.css";
 import Meta from "../../components/Meta";
 import Image from "next/image";
@@ -10,7 +9,6 @@ import { ethers } from 'ethers';
 import Card from './card';
 const NumberGame2 = () => {
   const { account, balance } = useWallet();
-
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const [openReward, setOpenReward] = useState(false);
   const [createEntryBet, setCreateEntryBet] = useState("");
@@ -31,7 +29,6 @@ const NumberGame2 = () => {
     if (account && balance) {
       setIsWalletInitialized(true);
       console.log("Wallet Initialized");
-
     }
   }, [account, balance]);
 
@@ -51,7 +48,6 @@ const NumberGame2 = () => {
     } catch (error) {
       return;
     }
-
   }
 
   async function getPlayerRewards() {
@@ -61,7 +57,6 @@ const NumberGame2 = () => {
     } catch (error) {
       return;
     }
-
   }
 
   const handleWithdraw = async () => {
@@ -221,12 +216,12 @@ const NumberGame2 = () => {
             </div>
           }
           {selectedPlayerJoinedGame &&
-            <div className="items-center">
+            <div className="items-center ">
+              <h1 className="text-center text-3xl font-semibold mb-5">Select a Card to play the game</h1>
               <div className="flex justify-between">
                 {cardsData.map((card, index) => (
-                  <Card key={index} front={card.front} back={card.back} />
+                  <Card key={index} front={card.front} back={card.back} selectedPlayerJoinedGame={selectedPlayerJoinedGame} />
                 ))}
-
               </div>
 
               <div className="flex flex-col items-center">
