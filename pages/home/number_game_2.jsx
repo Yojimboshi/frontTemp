@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactCardFlip from 'react-card-flip';
 import "tippy.js/dist/tippy.css";
 import Meta from "../../components/Meta";
 import Image from "next/image";
@@ -6,7 +7,7 @@ import { useWallet } from '../../context/walletContext';
 import useNumberofRisk from '../../components/numbergame/NumberofRisk';
 import txUpdateDisplay from '../../utils/txUpdateDisplay';
 import { ethers } from 'ethers';
-
+import Card from './card';
 const NumberGame2 = () => {
   const { account, balance } = useWallet();
 
@@ -17,10 +18,11 @@ const NumberGame2 = () => {
   const [gamePlayed, setGamePlayed] = useState(false);
   const [playerJoinedGame, setPlayerJoinedGame] = useState([]);
   const [selectedPlayerJoinedGame, setSelectedPlayerJoinedGame] = useState('');
-  const [leftContent, setLeftContent] = useState("Left Container");
-  const [middleContent, setMiddleContent] = useState("Middle Container");
-  const [rightContent, setRightContent] = useState("Right Container");
-
+  const cardsData = [
+    { front: 'Card 1', back: 'Content for Card 1' },
+    { front: 'Card 2', back: 'Content for Card 2' },
+    { front: 'Card 3', back: 'Content for Card 3' },
+  ];
   // Only invoke useNumberGame once the wallet is initialized.
   const numberGameHooks = useNumberofRisk();
   const { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress, playerRewards } = isWalletInitialized ? numberGameHooks : {};
@@ -132,22 +134,6 @@ const NumberGame2 = () => {
     setOpenReward(!openReward);
   };
 
-  const handleContainerClick = (container) => {
-    switch (container) {
-      case 'left':
-        setLeftContent("Left Container Clicked!");
-        break;
-      case 'middle':
-        setMiddleContent("Middle Container Clicked!");
-        break;
-      case 'right':
-        setRightContent("Right Container Clicked!");
-        break;
-      default:
-        break;
-    }
-  };
-
 
   return (
     <>
@@ -237,24 +223,10 @@ const NumberGame2 = () => {
           {selectedPlayerJoinedGame &&
             <div className="items-center">
               <div className="flex justify-between">
-                <div
-                  className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-lg border bg-white p-12 cursor-pointer"
-                  onClick={() => handleContainerClick('left')}
-                >
-                  {leftContent}
-                </div>
-                <div
-                  className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-lg border bg-white p-12 cursor-pointer"
-                  onClick={() => handleContainerClick('middle')}
-                >
-                  {middleContent}
-                </div>
-                <div
-                  className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-lg border bg-white p-12 cursor-pointer"
-                  onClick={() => handleContainerClick('right')}
-                >
-                  {rightContent}
-                </div>
+                {cardsData.map((card, index) => (
+                  <Card key={index} front={card.front} back={card.back} />
+                ))}
+
               </div>
 
               <div className="flex flex-col items-center">
