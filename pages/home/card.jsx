@@ -1,22 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 import ReactCardFlip from 'react-card-flip';
 import useNumberofRisk from '../../components/numbergame/NumberofRisk';
-const Card = ({ front, back,selectedPlayerJoinedGame}) => {
+import txUpdateDisplay from '../../utils/txUpdateDisplay';
+import { useWallet } from '../../context/walletContext';
+const Card = ({ front, back, selectedPlayerJoinedGame }) => {
+    const { account, balance } = useWallet();
     const [isFlipped, setFlipped] = useState(false);
     const [hasFlipped, setHasFlipped] = useState(false);
-    const { playGame } = useNumberofRisk();
+    const [roundNumber, setRoundNumber]= useState([]);
+    const { playGame, getRoundBasedonGameId } = useNumberofRisk();
 
-    const handleCardFlip =async  () => {
+    useEffect(() => {
+
+    }, []);
+
+    const getRoundNumberfromGameId = async () =>{
+        getRoundBasedonGameId
+    }
+
+    const handleCardFlip = async () => {
         if (!hasFlipped) {
-            try{
-                console.log("asdasd")
-                const transactionPromise = await playGame(0, selectedPlayerJoinedGame);
-
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
+            try {
+                const transactionPromise = await playGame(selectedPlayerJoinedGame);
                 setFlipped(true);
                 setHasFlipped(true);
-            }catch(error){
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
+
+            } catch (error) {
                 console.log(error);
             }
 

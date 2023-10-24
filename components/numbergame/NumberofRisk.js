@@ -24,7 +24,7 @@ export default function useNumberofRisk() {
     };
 
     const playGame = (gameid) => {
-        return contract.playGame(0, gameid, { gasLimit: 100000 });
+        return contract.playGame(gameid, { gasLimit: 100000 });
     };
 
     const createGame = (entryBet) => {
@@ -50,6 +50,19 @@ export default function useNumberofRisk() {
         }
         return activeGameIds;
     }
+    const getRoundBasedonGameId = async () => {
+        let activeCount = 0;
+        const nextGameId = await contract.nextGameId();
+        var activeGameIds = [];
+        for (let i = 1; i < nextGameId; i++) {
+            const gameAfterCreation = await contract.games(i);
+            if (gameAfterCreation.player.toLowerCase() == account && gameAfterCreation.currentState != 5) {
+                activeGameIds.push([gameAfterCreation.rounds, i]);
+                activeCount++;
+            }
+        }
+        return activeGameIds;
+    }
 
     const playerRewards = async () => {
         let activeCount = 0;
@@ -66,5 +79,5 @@ export default function useNumberofRisk() {
         return rewardsIds;
     }
 
-    return { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress, playerRewards };
+    return { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress,getRoundBasedonGameId, playerRewards };
 }

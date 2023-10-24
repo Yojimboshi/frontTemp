@@ -23,7 +23,7 @@ const NumberGame2 = () => {
   ];
   // Only invoke useNumberGame once the wallet is initialized.
   const numberGameHooks = useNumberofRisk();
-  const { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress, playerRewards } = isWalletInitialized ? numberGameHooks : {};
+  const { withdraw, createGame, availableGameBasedOnPlayerAddress, playerRewards } = isWalletInitialized ? numberGameHooks : {};
 
   useEffect(() => {
     if (account && balance) {
@@ -71,19 +71,6 @@ const NumberGame2 = () => {
     }
   };
 
-  const handlePlayGame = async () => {
-    try {
-
-      const transactionPromise = await playGame(0, selectedPlayerJoinedGame);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
-      // Maybe provide some success feedback here
-      setGamePlayed(true);
-    } catch (error) {
-      console.error(error);
-      // Display this error to the user
-    }
-  };
 
   const handleCreateGame = async () => {
     if (!createGame) {
@@ -225,10 +212,6 @@ const NumberGame2 = () => {
               </div>
 
               <div className="flex flex-col items-center">
-                <button
-                  className=" bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
-                  onClick={handlePlayGame}
-                >Play Game</button>
                 <button
                   className=" bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
                   onClick={handleWithdraw}
