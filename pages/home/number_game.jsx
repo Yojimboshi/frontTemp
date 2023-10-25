@@ -63,6 +63,7 @@ const NumberGame = () => {
     try {
 
       const transactionPromise = await joinGame(entryBet, selectedAvailableGames);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here
@@ -76,6 +77,7 @@ const NumberGame = () => {
   const handleGuess = async () => {
     try {
       const transactionPromise = await guess(guessBet, playerGuess, selectedPlayerJoinedGame);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here
@@ -89,6 +91,7 @@ const NumberGame = () => {
     try {
 
       const transactionPromise = await withdraw(selectedPlayerJoinedGame);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here
@@ -106,6 +109,7 @@ const NumberGame = () => {
     try {
 
       const transactionPromise = await createGame(createEntryBet);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here

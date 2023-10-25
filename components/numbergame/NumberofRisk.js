@@ -4,10 +4,15 @@ import numberofRiskAbi from '../../data/abi/numberofRiskabi.json';
 import { numberofRiskAddress } from '../../config/setting';
 import { useWallet } from '../../context/walletContext';
 
-
 export default function useNumberofRisk() {
     const { account, balance } = useWallet();
     const [contract, setContract] = useState(null);
+    const stateMappings = {
+        1: 'Round 1',
+        2: 'Round 2',
+        3: 'Round 3'
+    };
+    
     useEffect(() => {
         if (window.ethereum && account) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -33,7 +38,7 @@ export default function useNumberofRisk() {
             return null;
         }
         const valueToSend = ethers.utils.parseEther(entryBet);
-        return contract.createGame({ value: valueToSend, gasLimit: 1000000 });
+        return contract.createGame({ value: valueToSend, gasLimit: 1000000 })
     }
 
 
@@ -50,6 +55,7 @@ export default function useNumberofRisk() {
         }
         return activeGameIds;
     }
+
     const getRoundBasedonGameId = async () => {
         let activeCount = 0;
         const nextGameId = await contract.nextGameId();
@@ -57,12 +63,15 @@ export default function useNumberofRisk() {
         for (let i = 1; i < nextGameId; i++) {
             const gameAfterCreation = await contract.games(i);
             if (gameAfterCreation.player.toLowerCase() == account && gameAfterCreation.currentState != 5) {
-                activeGameIds.push([gameAfterCreation.rounds, i]);
+                const reward = ethers.utils.formatEther(gameAfterCreation.reward);
+                activeGameIds.push([stateMappings[gameAfterCreation.currentState],reward, i]);
                 activeCount++;
             }
         }
         return activeGameIds;
     }
+
+
 
     const playerRewards = async () => {
         let activeCount = 0;
@@ -79,5 +88,5 @@ export default function useNumberofRisk() {
         return rewardsIds;
     }
 
-    return { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress,getRoundBasedonGameId, playerRewards };
+    return { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress,getRoundBasedonGameId ,playerRewards };
 }

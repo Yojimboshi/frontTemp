@@ -13,14 +13,15 @@ const NumberGame2 = () => {
   const [openReward, setOpenReward] = useState(false);
   const [createEntryBet, setCreateEntryBet] = useState("");
   const [reward, setReward] = useState("");
-  const [gamePlayed, setGamePlayed] = useState(false);
+  const [createdGame, setCreatedGame] = useState(false);
   const [playerJoinedGame, setPlayerJoinedGame] = useState([]);
   const [selectedPlayerJoinedGame, setSelectedPlayerJoinedGame] = useState('');
-  const cardsData = [
-    { front: 'Card 1', back: 'Content for Card 1' },
-    { front: 'Card 2', back: 'Content for Card 2' },
-    { front: 'Card 3', back: 'Content for Card 3' },
-  ];
+  const [roundsReward, setRoundsRewards] = useState([]);
+  const [cardsData, setCardsData] = useState([
+    { front: '/images/custom/card.jpg', back: 'Content for Card 1' },
+    { front: '/images/custom/card.jpg', back: 'Content for Card 2' },
+    { front: '/images/custom/card.jpg', back: 'Content for Card 3' },
+  ]);
   // Only invoke useNumberGame once the wallet is initialized.
   const numberGameHooks = useNumberofRisk();
   const { withdraw, createGame, availableGameBasedOnPlayerAddress, playerRewards } = isWalletInitialized ? numberGameHooks : {};
@@ -28,7 +29,6 @@ const NumberGame2 = () => {
   useEffect(() => {
     if (account && balance) {
       setIsWalletInitialized(true);
-      console.log("Wallet Initialized");
     }
   }, [account, balance]);
 
@@ -36,9 +36,9 @@ const NumberGame2 = () => {
     if (isWalletInitialized) {
       getAvailableGames();
       getPlayerRewards();
-      setGamePlayed(false);
+      setCreatedGame(false);
     }
-  }, [isWalletInitialized, gamePlayed]);
+  }, [isWalletInitialized, createdGame]);
 
 
   async function getAvailableGames() {
@@ -62,8 +62,9 @@ const NumberGame2 = () => {
   const handleWithdraw = async () => {
     try {
       const transactionPromise = await withdraw(selectedPlayerJoinedGame);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
+      await txUpdateDisplay(transactionPromise, provider, account);
       // Maybe provide some success feedback here
     } catch (error) {
       console.error(error);
@@ -80,8 +81,10 @@ const NumberGame2 = () => {
     try {
 
       const transactionPromise = await createGame(createEntryBet);
+      await transactionPromise.wait();
+      setCreatedGame(true);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
+      await txUpdateDisplay(transactionPromise, provider, account);
       // Maybe provide some success feedback here
     } catch (error) {
       console.error(error);
@@ -102,20 +105,16 @@ const NumberGame2 = () => {
     }
   };
 
-  const handlePlayerRewards = (event) => {
-    const selectedValue = event.target.value;
-
-    if (selectedValue !== '' && !playerJoinedGame.includes(selectedValue)) {
-      setSelectedPlayerJoinedGame(selectedValue);
-    } else {
-      setSelectedPlayerJoinedGame('');
-    }
-  };
-
   const handleOpenReward = () => {
     setOpenReward(!openReward);
   };
 
+  const handleCardClick = (index) => {
+
+    const updatedCardsData = [...cardsData];
+    updatedCardsData[index].back = roundsReward[index][1];
+    setCardsData(updatedCardsData);
+  };
 
   return (
     <>
@@ -185,18 +184,15 @@ const NumberGame2 = () => {
                 <div className="p-4">Chances to win</div>
                 <div className=" p-4">Round 1</div>
                 <div className=" p-4 whitespace-pre-line">
-                  Small win = x1.0 - x1.5{'\n'}
-                  Big win = x2.0 - x3.0
+                  Chance to win up to x3
                 </div>
                 <div className=" p-4">Round 2</div>
                 <div className="p-4 whitespace-pre-line">
-                  Small win = x1.0 - x2.0{'\n'}
-                  Big win = x1.0 - x2.8
+                  Chance to win up to x6
                 </div>
                 <div className="p-4">Round 3</div>
                 <div className="p-4 whitespace-pre-line">
-                  Small win = x1.0 - x2.2{'\n'}
-                  Big win = x1.0 - x3.0
+                  Chance to win up to x10
                 </div>
 
               </div>
@@ -207,7 +203,16 @@ const NumberGame2 = () => {
               <h1 className="text-center text-3xl font-semibold mb-5">Select a Card to play the game</h1>
               <div className="flex justify-between">
                 {cardsData.map((card, index) => (
-                  <Card key={index} front={card.front} back={card.back} selectedPlayerJoinedGame={selectedPlayerJoinedGame} />
+                   <div key={index} className="w-1/3 p-2">
+                  <Card
+                    onClick={() => handleCardClick(index)}
+                    key={index}
+                    front={<img src={card.front} alt={`Card ${index + 1}`} style={{ width: '100%', height: '100%' }} />}
+                    back={card.back}
+                    selectedPlayerJoinedGame={selectedPlayerJoinedGame}
+                    onRoundAndRewardsChange={setRoundsRewards}
+                  />
+                  </div>
                 ))}
               </div>
 
