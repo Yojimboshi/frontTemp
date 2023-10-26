@@ -3,10 +3,10 @@ import "tippy.js/dist/tippy.css";
 import Meta from "../../components/Meta";
 import Image from "next/image";
 import { useWallet } from '../../context/walletContext';
-import useNumberofRisk from '../../components/numbergame/NumberofRisk';
+import useNumberofRisk from '../../components/numbergame/CardGameOfRisks';
 import txUpdateDisplay from '../../utils/txUpdateDisplay';
 import { ethers } from 'ethers';
-import Card from './card';
+import Card from '../../components/numbergame/card';
 const NumberGame2 = () => {
   const { account, balance } = useWallet();
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
@@ -95,7 +95,6 @@ const NumberGame2 = () => {
 
   const handleOpenReward = () => {
     setOpenReward(!openReward);
-    console.log(cardsData);
   };
 
   return (

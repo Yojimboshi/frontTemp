@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import ReactCardFlip from 'react-card-flip';
-import useNumberofRisk from '../../components/numbergame/NumberofRisk';
+import useNumberofRisk from './CardGameOfRisks';
 import txUpdateDisplay from '../../utils/txUpdateDisplay';
 import { useWallet } from '../../context/walletContext';
-const Card = ({ front, back, cardIndex, selectedPlayerJoinedGame, cardsData,settingCardsData  }) => {
+const Card = ({ front, back, cardIndex, selectedPlayerJoinedGame, cardsData, settingCardsData }) => {
     const numberGameHooks = useNumberofRisk();
     const { getRoundBasedonGameId } = numberGameHooks;
     const { account, balance } = useWallet();
@@ -18,12 +18,13 @@ const Card = ({ front, back, cardIndex, selectedPlayerJoinedGame, cardsData,sett
                 setFlipped(false);
                 setHasFlipped(false);
                 const transactionPromise = await playGame(selectedPlayerJoinedGame);
-                const receipt = await transactionPromise.wait();
+                const receipt = await transactionPromise.wait(); // get receipt
 
                 const tempRoundandRewards = await getRoundBasedonGameId();
-                const rewardsBasedonGameId=checkRewardfromGameId(tempRoundandRewards,selectedPlayerJoinedGame)
+                const rewardsBasedonGameId = checkRewardfromGameId(tempRoundandRewards, selectedPlayerJoinedGame)
                 const updatedCardsData = [...cardsData];
                 updatedCardsData[cardIndex].back = rewardsBasedonGameId;
+
                 settingCardsData(updatedCardsData);
 
                 setFlipped(true);
@@ -38,14 +39,16 @@ const Card = ({ front, back, cardIndex, selectedPlayerJoinedGame, cardsData,sett
         }
     };
 
-    const checkRewardfromGameId = (tempRoundandRewards,selectedPlayerJoinedGame) =>{
-        for(let i = 0; i <tempRoundandRewards.length;i++){
-            if(tempRoundandRewards[i][2] == selectedPlayerJoinedGame){
+    const checkRewardfromGameId = (tempRoundandRewards, selectedPlayerJoinedGame) => {
+        for (let i = 0; i < tempRoundandRewards.length; i++) {
+            if (tempRoundandRewards[i][2] == selectedPlayerJoinedGame) {
                 const rewardsBasedonGameId = tempRoundandRewards[i][1];
-                return rewardsBasedonGameId;
+                const winMessage = "You won: " + rewardsBasedonGameId + "ETH"
+                return winMessage;
             }
         }
-        return;
+        const loseMessage = "You Lost"
+        return loseMessage;
     }
 
     return (
