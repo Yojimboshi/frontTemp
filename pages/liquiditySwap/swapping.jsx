@@ -4,6 +4,7 @@ import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/Liquidity
 import { performTrade } from "../../hooks/useRouterContract";
 import { getUserTokenBalance, getTokenAllowance, getTokenSymbol } from "../../hooks/useTokenContract";
 import { getPriceImpact } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
+import { initialTokens } from '../../config/tokens';
 import { useSelector } from "react-redux";
 import { utils } from 'ethers';
 import { initialTokens } from '../../config/tokens';
