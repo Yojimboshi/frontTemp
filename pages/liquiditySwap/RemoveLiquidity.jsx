@@ -4,6 +4,8 @@ import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/Liquidity
 import { useRemoveLiquidity } from "../../hooks/useRouterContract";
 import { getTokenSymbol } from "../../hooks/useTokenContract";
 import { getTokenLiquidityBalance, getPoolShareandUserBalance, getRemoveTokenLiquidityBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
+import { initialTokens } from '../../config/tokens';
+import { toast } from 'react-toastify';
 import { useSelector } from "react-redux";
 import { utils } from 'ethers';
 import { initialTokens } from '../../config/tokens';
@@ -66,8 +68,13 @@ const LiquidityPool = () => {
     }, [tokenPairAvailable]);
 
     async function RemoveLiquidity() {
-        if (!isNaN(liquidityPercentage)) {
-            useRemoveLiquidity(tokenAddress1, tokenAddress2, liquidityPercentage, defaultAccount, provider, tokenReserve)
+        try {
+            if (!isNaN(liquidityPercentage)) {
+                await useRemoveLiquidity(tokenAddress1, tokenAddress2, liquidityPercentage, defaultAccount, provider, tokenReserve);
+            }
+        } catch (error) {
+            console.error("Error removing liquidity:", error); // For debugging purposes
+            toast.error("An error occurred while removing liquidity. Please try again later.");
         }
     }
 
