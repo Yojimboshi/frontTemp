@@ -6,6 +6,7 @@ const txUpdateDisplay = async (transactionPromise, provider, account, updateBala
     try {
         const txResponse = await transactionPromise;
         receipt = await txResponse.wait();
+        console.log(receipt);
     } catch (error) {
         console.error("Error sending transaction:", error);
     } finally {
@@ -20,6 +21,7 @@ const txUpdateDisplay = async (transactionPromise, provider, account, updateBala
     }
 
     if (receipt && receipt.status === 1) {
+        console.log(receipt);
         return receipt;
     } else {
         console.error("Transaction failed or not executed");

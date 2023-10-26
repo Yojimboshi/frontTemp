@@ -1,4 +1,5 @@
 const numberGameAddress = "0xF3d6e325CF53202d54fF941E4D0fC32733c708e1";
+const numberofRiskAddress = "0x426D8fD7A6dB784D169463F0Ced0aB03Ce373275";
 const nftContractAddress = "0xB76D32661f7EAC3A10E3Fa9Ec7510C71e058f527";
 const providerURL = "https://goerli.infura.io/v3/5af30ed60a8b4765a596afccb963efe4";
 const etherRouterContractV2 = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
@@ -12,6 +13,7 @@ const wrappedBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
 
 module.exports = {
   numberGameAddress,
+  numberofRiskAddress,
   nftContractAddress,
   providerURL,
   etherRouterContractV2,
