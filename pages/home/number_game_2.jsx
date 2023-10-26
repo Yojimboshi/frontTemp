@@ -12,11 +12,9 @@ const NumberGame2 = () => {
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const [openReward, setOpenReward] = useState(false);
   const [createEntryBet, setCreateEntryBet] = useState("");
-  const [reward, setReward] = useState("");
   const [createdGame, setCreatedGame] = useState(false);
   const [playerJoinedGame, setPlayerJoinedGame] = useState([]);
   const [selectedPlayerJoinedGame, setSelectedPlayerJoinedGame] = useState('');
-  const [roundsReward, setRoundsRewards] = useState([]);
   const [cardsData, setCardsData] = useState([
     { front: '/images/custom/card.jpg', back: 'Content for Card 1' },
     { front: '/images/custom/card.jpg', back: 'Content for Card 2' },
@@ -24,7 +22,7 @@ const NumberGame2 = () => {
   ]);
   // Only invoke useNumberGame once the wallet is initialized.
   const numberGameHooks = useNumberofRisk();
-  const { withdraw, createGame, availableGameBasedOnPlayerAddress, playerRewards } = isWalletInitialized ? numberGameHooks : {};
+  const { withdraw, createGame, availableGameBasedOnPlayerAddress } = isWalletInitialized ? numberGameHooks : {};
 
   useEffect(() => {
     if (account && balance) {
@@ -35,7 +33,6 @@ const NumberGame2 = () => {
   useEffect(() => {
     if (isWalletInitialized) {
       getAvailableGames();
-      getPlayerRewards();
       setCreatedGame(false);
     }
   }, [isWalletInitialized, createdGame]);
@@ -50,14 +47,6 @@ const NumberGame2 = () => {
     }
   }
 
-  async function getPlayerRewards() {
-    try {
-      const tempPlayerRewards = await playerRewards();
-      setReward(tempPlayerRewards);
-    } catch (error) {
-      return;
-    }
-  }
 
   const handleWithdraw = async () => {
     try {
@@ -92,7 +81,6 @@ const NumberGame2 = () => {
     }
   };
 
-
   {/*<---- Interface Handler ----> */ }
 
   const handlePlayerJoinedGameOption = (event) => {
@@ -107,13 +95,7 @@ const NumberGame2 = () => {
 
   const handleOpenReward = () => {
     setOpenReward(!openReward);
-  };
-
-  const handleCardClick = (index) => {
-
-    const updatedCardsData = [...cardsData];
-    updatedCardsData[index].back = roundsReward[index][1];
-    setCardsData(updatedCardsData);
+    console.log(cardsData);
   };
 
   return (
@@ -203,15 +185,16 @@ const NumberGame2 = () => {
               <h1 className="text-center text-3xl font-semibold mb-5">Select a Card to play the game</h1>
               <div className="flex justify-between">
                 {cardsData.map((card, index) => (
-                   <div key={index} className="w-1/3 p-2">
-                  <Card
-                    onClick={() => handleCardClick(index)}
-                    key={index}
-                    front={<img src={card.front} alt={`Card ${index + 1}`} style={{ width: '100%', height: '100%' }} />}
-                    back={card.back}
-                    selectedPlayerJoinedGame={selectedPlayerJoinedGame}
-                    onRoundAndRewardsChange={setRoundsRewards}
-                  />
+                  <div key={index} className="w-1/3 p-2">
+                    <Card
+                      key={index}
+                      front={<img src={card.front} alt={`Card ${index + 1}`} style={{ width: '100%', height: '100%' }} />}
+                      back={card.back}
+                      cardIndex={index}
+                      selectedPlayerJoinedGame={selectedPlayerJoinedGame}
+                      cardsData={cardsData}
+                      settingCardsData={setCardsData}
+                    />
                   </div>
                 ))}
               </div>

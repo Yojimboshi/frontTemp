@@ -8,9 +8,9 @@ export default function useNumberofRisk() {
     const { account, balance } = useWallet();
     const [contract, setContract] = useState(null);
     const stateMappings = {
-        1: 'Round 1',
-        2: 'Round 2',
-        3: 'Round 3'
+        0: 'Round 1',
+        1: 'Round 2',
+        2: 'Round 3'
     };
     
     useEffect(() => {
@@ -72,21 +72,5 @@ export default function useNumberofRisk() {
     }
 
 
-
-    const playerRewards = async () => {
-        let activeCount = 0;
-        const nextGameId = await contract.nextGameId();
-        var rewardsIds = [];
-        for (let i = 1; i < nextGameId; i++) {
-            const gameAfterCreation = await contract.games(i);
-            if (gameAfterCreation.player.toLowerCase() == account && gameAfterCreation.currentState != 5) {
-                const Rewards = parseFloat(gameAfterCreation.reward);
-                rewardsIds[Rewards] = i;
-                activeCount++;
-            }
-        }
-        return rewardsIds;
-    }
-
-    return { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress,getRoundBasedonGameId ,playerRewards };
+    return { playGame, withdraw, createGame, availableGameBasedOnPlayerAddress,getRoundBasedonGameId };
 }
