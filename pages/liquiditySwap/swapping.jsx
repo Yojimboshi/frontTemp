@@ -7,7 +7,6 @@ import { getPriceImpact } from "../../components/LiquidityPoolSwap/LiquidityPool
 import { initialTokens } from '../../config/tokens';
 import { useSelector } from "react-redux";
 import { utils } from 'ethers';
-import { initialTokens } from '../../config/tokens';
 
 const Swapping = () => {
   const [tokenAddress1, setTokenAddress1] = useState("");

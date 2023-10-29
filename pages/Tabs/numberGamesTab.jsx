@@ -1,6 +1,6 @@
 import { useState } from "react";
-import NumberGame from "./GuessingGame";
-import NumberGame2 from "./CardGame";
+import NumberGame from "../home/GuessingGame";
+import NumberGame2 from "../home/CardGame";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 const NumberGameTab = () => {
   const [itemActive, setItemActive] = useState(1);

@@ -4,7 +4,6 @@ import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/Liquidity
 import { useRemoveLiquidity } from "../../hooks/useRouterContract";
 import { getTokenSymbol } from "../../hooks/useTokenContract";
 import { getTokenLiquidityBalance, getPoolShareandUserBalance, getRemoveTokenLiquidityBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
-import { initialTokens } from '../../config/tokens';
 import { toast } from 'react-toastify';
 import { useSelector } from "react-redux";
 import { utils } from 'ethers';

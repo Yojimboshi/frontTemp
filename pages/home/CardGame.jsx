@@ -6,6 +6,7 @@ import { useWallet } from '../../context/walletContext';
 import useNumberofRisk from '../../components/numbergame/CardGameOfRisks';
 import txUpdateDisplay from '../../utils/txUpdateDisplay';
 import { ethers } from 'ethers';
+import { toast } from 'react-toastify';
 import Card from '../../components/numbergame/card';
 const NumberGame2 = () => {
   const { account, balance } = useWallet();
@@ -76,8 +77,14 @@ const NumberGame2 = () => {
       await txUpdateDisplay(transactionPromise, provider, account);
       // Maybe provide some success feedback here
     } catch (error) {
-      console.error(error);
-      // Display this error to the user
+      if (error.code === 4001) {
+        // User canceled or rejected the transaction
+        setFlipped(false);
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("Contract out of Ethers/ Bet does not reach the minimum requirement");
+      }
+
     }
   };
 
