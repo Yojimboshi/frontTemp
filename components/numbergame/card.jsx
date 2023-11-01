@@ -34,17 +34,18 @@ const Card = ({ front, back, cardIndex, selectedPlayerJoinedGame, cardsData, set
                 setTimeout(() => {
                     setFlipped(false);
                     setHasFlipped(false);
-                }, 15000);
+                }, 10000);
+
             } catch (error) {
-                if (error.code === 4001) {
+                if (error.code === "ACTION_REJECTED") {
                     setHasFlipped(false);
                     toast.error("Transaction canceled");
                 } else {
                     // Handle other errors
+                    setHasFlipped(false);
                     toast.error("Error Playing game");
                 }
             }
-
         }
     };
 
