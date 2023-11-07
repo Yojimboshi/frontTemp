@@ -2,7 +2,7 @@
 import { AddressZero } from "@ethersproject/constants";
 import { Contract } from "@ethersproject/contracts";
 import { getAddress } from "@ethersproject/address";
-
+import { toast } from 'react-toastify';
 export function getContract(address, ABI, provider, account) {
   if (!isAddress(address) || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`);
@@ -10,7 +10,7 @@ export function getContract(address, ABI, provider, account) {
   try {
     return new Contract(address, ABI, getProviderOrSigner(provider, account));
   } catch (error) {
-    console.log(error);
+    toast.error(error);
   }
 }
 

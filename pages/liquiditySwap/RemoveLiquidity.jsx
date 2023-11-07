@@ -72,8 +72,13 @@ const LiquidityPool = () => {
                 await useRemoveLiquidity(tokenAddress1, tokenAddress2, liquidityPercentage, defaultAccount, provider, tokenReserve);
             }
         } catch (error) {
-            console.error("Error removing liquidity:", error); // For debugging purposes
-            toast.error("An error occurred while removing liquidity. Please try again later.");
+            if (error.code === "ACTION_REJECTED") {
+                // User canceled or rejected the transaction
+                toast.error("Transaction canceled");
+              } else {
+                toast.error("An error occurred while removing liquidity. Please try again later.");
+              }
+
         }
     }
 
@@ -84,7 +89,7 @@ const LiquidityPool = () => {
             setTokenSymbol1(token1Symbol)
             setTokenSymbol2(token2Symbol)
         } catch (error) {
-            console.log(error)
+            toast.error(error);
         }
     }
 

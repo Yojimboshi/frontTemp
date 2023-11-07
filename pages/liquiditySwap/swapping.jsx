@@ -48,8 +48,6 @@ const Swapping = () => {
       setTokenPairAvailable
     });
     getChainId()
-    console.log(tokenPairAvailable);
-    console.log(tokenSymbol1);
   }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
   useEffect(() => {
@@ -77,7 +75,7 @@ const Swapping = () => {
       setTokenSymbol1(token1Symbol)
       setTokenSymbol2(token2Symbol)
     } catch (error) {
-      console.log(error)
+      toast.error(error);
     }
   }
 
@@ -88,7 +86,7 @@ const Swapping = () => {
       setToken1Balance(t1balance)
       setToken2Balance(t2balance)
     } catch (error) {
-      console.log(error);
+      toast.error(error);
     }
   }
 
@@ -119,10 +117,18 @@ const Swapping = () => {
   {/*<---- Interface Handler ----> */ }
 
   const swapToken = async () => {
-    if (!isNaN(tokenAmount1)) {
-      performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
+    try{
+      if (!isNaN(tokenAmount1)) {
+        performTrade(tokenAddress1, tokenAddress2, tokenAmount1, defaultAccount, provider, tokenReserve);
+      }
+    }catch(error){
+      if (error.code === "ACTION_REJECTED") {
+        // User canceled or rejected the transaction
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("An error occurred while Swapping. Please try again later.");
+      }
     }
-
   };
 
   const handleToken1AddressChange = (event) => {
