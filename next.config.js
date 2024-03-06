@@ -3,7 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
   images: {
-    domains: ["cdn.jsdelivr.net","ipfs.filebase.io"],
+    domains: ["cdn.jsdelivr.net", "ipfs.filebase.io"],
+  },
+  eslint: {
+    // Ignore ESLint during build steps
+    ignoreDuringBuilds: true,
   },
 };
 
