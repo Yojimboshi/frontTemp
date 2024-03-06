@@ -5,7 +5,7 @@ import "swiper/css/navigation";
 import Image from "next/image";
 import "tippy.js/dist/tippy.css";
 import { MdKeyboardArrowRight, MdKeyboardArrowLeft } from "react-icons/md";
-import Feature_collections_data from "../../data/Feature_collections_data";
+import {Feature_collections_data} from "../../data/Feature_collections_data";
 import Link from "next/link";
 
 const Feature_collections_carousel = () => {
