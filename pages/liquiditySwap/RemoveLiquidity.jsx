@@ -1,7 +1,7 @@
 import SetupSwapPool from "../../components/LiquidityPoolSwap/SetupSwapPool";
 import { useEffect, useState } from "react";
 import { setupLiquidityPool } from "../../components/LiquidityPoolSwap/LiquidityPoolSetup";
-import { useRemoveLiquidity } from "../../hooks/useRouterContract";
+import { removeLiquidity  } from "../../hooks/useRouterContract";
 import { getTokenSymbol } from "../../hooks/useTokenContract";
 import { getTokenLiquidityBalance, getPoolShareandUserBalance, getRemoveTokenLiquidityBalance } from "../../components/LiquidityPoolSwap/LiquidityPoolFunctions";
 import { toast } from 'react-toastify';
@@ -65,21 +65,20 @@ const LiquidityPool = () => {
         }
     }, [tokenPairAvailable]);
 
-    async function RemoveLiquidity() {
+    const handleRemoveLiquidity = useCallback(async () => {
         try {
-            if (!isNaN(liquidityPercentage)) {
-                await useRemoveLiquidity(tokenAddress1, tokenAddress2, liquidityPercentage, defaultAccount, provider, tokenReserve);
+            if (!isNaN(liquidityPercentage) && utils.isAddress(tokenAddress1) && utils.isAddress(tokenAddress2)) {
+                await removeLiquidity(tokenAddress1, tokenAddress2, liquidityPercentage, defaultAccount, provider, tokenReserve);
+                // Handle successful removal, e.g., updating UI or state
             }
         } catch (error) {
             if (error.code === "ACTION_REJECTED") {
-                // User canceled or rejected the transaction
                 toast.error("Transaction canceled");
-              } else {
+            } else {
                 toast.error("An error occurred while removing liquidity. Please try again later.");
-              }
-
+            }
         }
-    }
+    }, [liquidityPercentage, tokenAddress1, tokenAddress2, defaultAccount, provider, tokenReserve]);
 
     async function getTokenSymbols() {
         try {
@@ -267,8 +266,8 @@ const LiquidityPool = () => {
             </div>
             <div>
                 <button className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-3 px-8 text-center font-semibold text-white transition-all m-3"
-                    onClick={RemoveLiquidity}>
-                    RemoveLiquidity
+                    onClick={handleRemoveLiquidity}>
+                    handleRemoveLiquidity
                 </button>
             </div>
         </div>

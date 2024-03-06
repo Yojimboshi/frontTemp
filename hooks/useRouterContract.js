@@ -175,7 +175,7 @@ export async function calculateSlipageRatio(amountIn, tokenReserve, provider) {
 	return slippage / amountOutV2;
 }
 
-export async function useRemoveLiquidity(
+export async function removeLiquidity (
 	tokenAddress1,
 	tokenAddress2,
 	liquidityPrecentage,
