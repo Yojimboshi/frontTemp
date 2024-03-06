@@ -64,9 +64,6 @@ export async function useAddLiquidity(
 		amountOutMinToken2 = changeToEther(amountOutMinToken2);
 		token2Amount = ethers.utils.parseEther(token2Amount.toString());
 		token1Amount = ethers.utils.parseEther(token1Amount.toString());
-		console.log(amountOutMinToken1.toString());
-		console.log(amountOutMinToken2.toString());
-		console.log(deadline)
 		await contract.addLiquidity(
 			tokenAddress1,
 			tokenAddress2,
@@ -119,7 +116,6 @@ export async function performTrade(
 
 	const contract = getContract(contractAddress.routerAddress, uniSwapRouter_ABI, provider, userAddress);
 	const deadline = Math.floor(Date.now() / 1000) + 600; // 10 minute from the swap
-	console.log(deadline)
 	switch (chainID) {
 		case 1: // Etheruem net
 			nativeToken = "ETH";
@@ -165,7 +161,7 @@ export async function performTrade(
 			);
 		}
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 
 }
@@ -221,7 +217,6 @@ function slipCalcV2(_amountIn, _reserveIn, _reserveOut, _deciIn, _deciOut, Fee) 
 
 
 function getAmountOutV2(amountIn, reserveIn, reserveOut, DeciIn, DeciOut, Fee) {
-	console.log(reserveIn);
 	// DeciIn and DeciOut for decimal places correction of reserves
 
 	let amountOut;
@@ -229,7 +224,6 @@ function getAmountOutV2(amountIn, reserveIn, reserveOut, DeciIn, DeciOut, Fee) {
 	let amountInBN = BigNumber(amountIn);
 	let reserveInBN = BigNumber(reserveIn);
 	let reserveOutBN = BigNumber(reserveOut);
-	console.log(reserveInBN.toString());
 
 	// let deciCorrection = BigNumber(10).exponentiatedBy(DeciIn-DeciOut);
 	if (amountIn <= 0) {
@@ -271,8 +265,6 @@ async function checkTokenAllowance(tokenAmount, userAddress, tokenAddress, provi
 
 async function checkTokenPairAllowance(tokenAddress1, tokenAddress2, provider, userAddress, liquidity) {
 	const tokenPairAllowance = await getTokenPairAllowance(tokenAddress1, tokenAddress2, provider, userAddress);
-	console.log(liquidity)
-	console.log(tokenPairAllowance)
 	if (liquidity >= tokenPairAllowance) {
 		getTokenPairApproval(tokenAddress1, tokenAddress2, provider, userAddress);
 	} else {

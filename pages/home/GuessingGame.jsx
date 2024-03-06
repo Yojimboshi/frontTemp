@@ -6,31 +6,32 @@ import { useWallet } from '../../context/walletContext';
 import useNumberGame from '../../components/numbergame/numberGame';
 import txUpdateDisplay from '../../utils/txUpdateDisplay';
 import { ethers } from 'ethers';
+import { toast } from "react-toastify";
+import { parse } from "dotenv";
 
 const NumberGame = () => {
   const { account, balance } = useWallet();
 
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const [createEntryBet, setCreateEntryBet] = useState("");
-  const [entryBet, setEntryBet] = useState("");
   const [guessBet, setGuessBet] = useState("");
   const [availableGames, setAvailableGames] = useState([]);
   const [selectedAvailableGames, setSelectedAvailableGames] = useState('')
   const [playerJoinedGame, setPlayerJoinedGame] = useState([]);
   const [selectedPlayerJoinedGame, setSelectedPlayerJoinedGame] = useState('');
-  const [minimumBets, setminimumBets] = useState([])
+  const [minimumBets, setminimumBets] = useState("")
+  const [joinedMinimumBets, setJoinedMinimumBets] = useState("");
   const [playerGuess, setPlayerGuess] = useState("");
+  const [joinedPlayerAddress, setJoinedPlayerAddress] = useState([]);
   const [imageModal, setImageModal] = useState(false);
 
   // Only invoke useNumberGame once the wallet is initialized.
   const numberGameHooks = useNumberGame();
-  const { joinGame, guess, withdraw,createGame, availableGame, availableGameBasedOnPlayerAddress, getMinimumBetFromGameId } = isWalletInitialized ? numberGameHooks : {};
+  const { joinGame, guess, withdraw, createGame, availableGame, availableGameBasedOnPlayerAddress } = isWalletInitialized ? numberGameHooks : {};
 
   useEffect(() => {
     if (account && balance) {
       setIsWalletInitialized(true);
-      console.log("Wallet Initialized");
-
     }
   }, [account, balance]);
 
@@ -45,10 +46,8 @@ const NumberGame = () => {
     try {
       const tempAvailableGameForPlayer = await availableGameBasedOnPlayerAddress();
       const tempAvailableGame = await availableGame();
-      const tempMinimumBetBasedOnGameID = await getMinimumBetFromGameId();
       setAvailableGames(tempAvailableGame);
       setPlayerJoinedGame(tempAvailableGameForPlayer);
-      setminimumBets(tempMinimumBetBasedOnGameID);
     } catch (error) {
       return;
     }
@@ -61,14 +60,18 @@ const NumberGame = () => {
       return;
     }
     try {
-
-      const transactionPromise = await joinGame(entryBet, selectedAvailableGames);
+      const transactionPromise = await joinGame(minimumBets, selectedAvailableGames);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here
     } catch (error) {
-      console.error(error);
-      // Display this error to the user
+      if (error.code === "ACTION_REJECTED") {
+        // User canceled or rejected the transaction
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("Invalid Input");
+      }
     }
   };
 
@@ -76,12 +79,17 @@ const NumberGame = () => {
   const handleGuess = async () => {
     try {
       const transactionPromise = await guess(guessBet, playerGuess, selectedPlayerJoinedGame);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here
     } catch (error) {
-      console.error(error);
-      // Display this error to the user
+      if (error.code === "ACTION_REJECTED") {
+        // User canceled or rejected the transaction
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("Invalid Input");
+      }
     }
   };
 
@@ -89,60 +97,79 @@ const NumberGame = () => {
     try {
 
       const transactionPromise = await withdraw(selectedPlayerJoinedGame);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here
     } catch (error) {
-      console.error(error);
-      // Display this error to the user
+      if (error.code === "ACTION_REJECTED") {
+        // User canceled or rejected the transaction
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("Error occured");
+      }
     }
   };
 
   const handleCreateGame = async () => {
     if (!createGame) {
-      console.error("createGame function is not initialized yet.");
+      toast.error("createGame function is not initialized yet.");
       return;
     }
-    try {
 
+    if (isNaN(parseFloat(createEntryBet))) {
+      toast.error("Invalid Input!");
+      return;
+    }
+
+    try {
       const transactionPromise = await createGame(createEntryBet);
+      await transactionPromise.wait();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await txUpdateDisplay(transactionPromise, provider, account, updateBalance);
       // Maybe provide some success feedback here
     } catch (error) {
-      console.error(error);
-      // Display this error to the user
+      if (error.code === "ACTION_REJECTED") {
+        // User canceled or rejected the transaction
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("Contract out of Ethers / Bet does not reach the minimum requirement");
+      }
     }
   };
 
   {/*<---- Interface Handler ----> */ }
 
   const handleAvailbleGamesOption = (event) => {
-    const selectedValue = event.target.value;
-
+    let selectedValue = event.target.value;
+    selectedValue = selectedValue.split(',');
     if (selectedValue !== '' && !availableGames.includes(selectedValue)) {
-      setSelectedAvailableGames(selectedValue);
+      setminimumBets(selectedValue[1])
+      setSelectedAvailableGames(selectedValue[0]);
     } else {
       setSelectedAvailableGames('');
     }
   };
 
   const handlePlayerJoinedGameOption = (event) => {
-    const selectedValue = event.target.value;
-
+    let selectedValue = event.target.value;
+    selectedValue = selectedValue.split(',');
     if (selectedValue !== '' && !playerJoinedGame.includes(selectedValue)) {
-      setSelectedPlayerJoinedGame(selectedValue);
+      const playerAddresses = [selectedValue[2],selectedValue[3]];
+      setJoinedPlayerAddress(playerAddresses);
+      setJoinedMinimumBets(selectedValue[1]);
+      setSelectedPlayerJoinedGame(selectedValue[0]);
     } else {
       setSelectedPlayerJoinedGame('');
     }
   };
 
-  
+
 
   return (
     <>
       <Meta title={`Number Game || DEMO`} />
-      <section className="relative lg:mt-24 lg:pb-24 mt-24 pt-10 pb-24">
+      <section className="relative lg:pb-24 pb-24">
         <picture className="pointer-events-none absolute inset-0 -z-10 dark:hidden">
           <Image
             width={1518}
@@ -161,21 +188,21 @@ const NumberGame = () => {
             <h1 className="text-3xl font-semibold mb-5">Welcome to the Number Game</h1>
           </div>
           <div className="grid grid-cols-2 gap-4 items-center">
-              <button
-                className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-2 px-4 w-1/2 ml-auto text-center font-semibold text-white transition-all m-2"
-                disabled={!isWalletInitialized}
-                onClick={handleCreateGame}
-              >Create Game
-              </button>
-              <div style={{ width: '50%' }}>
-                <input
-                  value={createEntryBet}
-                  onChange={(e) => setCreateEntryBet(e.target.value)}
-                  className="border border-solid dark:border-jacarta-600 border-gray-300 mb-2 rounded-full py-2 px-4 w-full m-2"
-                  placeholder="Enter your Entry Bet here"
-                />
-              </div>
+            <button
+              className="bg-accent shadow-accent-volume hover:bg-accent-dark inline-block rounded-full py-2 px-4 w-1/2 ml-auto text-center font-semibold text-white transition-all m-2"
+              disabled={!isWalletInitialized}
+              onClick={handleCreateGame}
+            >Create Game
+            </button>
+            <div style={{ width: '50%' }}>
+              <input
+                value={createEntryBet}
+                onChange={(e) => setCreateEntryBet(e.target.value)}
+                className="border border-solid dark:border-jacarta-600 border-gray-300 mb-2 rounded-full py-2 px-4 w-full m-2"
+                placeholder="Entry Bet"
+              />
             </div>
+          </div>
           {selectedAvailableGames &&
             <div className="grid grid-cols-2 gap-4 items-center">
               <button
@@ -184,42 +211,40 @@ const NumberGame = () => {
                 onClick={handleJoinGame}
               >Join Game
               </button>
-              <h1>Default Bet Min =</h1>
               <div style={{ width: '50%' }}>
-                <input
-                  value={entryBet}
-                  onChange={(e) => setEntryBet(e.target.value)}
-                  className="border border-solid dark:border-jacarta-600 border-gray-300 mb-2 rounded-full py-2 px-4 w-full m-2"
-                  placeholder="Enter your Entry Bet here"
-                />
+                <h1>
+                  Minimum Bet: {minimumBets}
+                </h1>
               </div>
             </div>
           }
-          <div class="flex justify-center items-center">
-            <div class="flex justify-center items-center">
-              <div class="m-2">
-                <h1 class="mb-2">Available Games to join</h1>
-                <select className='text-jacarta-700 placeholder-jacarta-500 focus:ring-accent border-jacarta-100 w-60 rounded-2xl border py-[0.6875rem] px-4 dark:border-transparent dark:bg-white/[.15] dark:text-white dark:placeholder-white' 
+          <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center">
+              <div className="m-2">
+                <h1 className="mb-2">Available Games to join</h1>
+                <select className='text-jacarta-700 placeholder-jacarta-500 focus:ring-accent border-jacarta-100 w-60 rounded-2xl border py-[0.6875rem] px-4 dark:border-transparent dark:bg-white/[.15] dark:text-white dark:placeholder-white'
+                  defaultValue=""
                   onChange={handleAvailbleGamesOption}>
-                  <option disabled selected value="">Available Games to join</option>
+                  <option disabled value="">Available Games to join</option>
                   {availableGames.map((number, index) => (
                     <option key={index} value={number}>
-                      {number}
+                      {number[0]}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <div class="flex justify-center items-center">
-              <div class="m-2">
-                <h1 class="mb-2">Games that you have joined</h1>
-                <select className='text-jacarta-700 placeholder-jacarta-500 focus:ring-accent border-jacarta-100 w-60 rounded-2xl border py-[0.6875rem] px-4 dark:border-transparent dark:bg-white/[.15] dark:text-white dark:placeholder-white' 
+            <div className="flex justify-center items-center">
+              <div className="m-2">
+                <h1 className="mb-2">Games that you have joined</h1>
+                <select className='text-jacarta-700 placeholder-jacarta-500 focus:ring-accent border-jacarta-100 w-60 rounded-2xl border py-[0.6875rem] px-4 dark:border-transparent dark:bg-white/[.15] dark:text-white dark:placeholder-white'
+                  defaultValue=""
                   onChange={handlePlayerJoinedGameOption}>
-                  <option disabled selected value="">GamesIds that you joined</option>
+                  <option disabled value="">GamesIds that you joined</option>
                   {playerJoinedGame.map((number, index) => (
                     <option key={index} value={number}>
-                      {number}
+                      {number[0]}
                     </option>
                   ))}
                 </select>
@@ -237,8 +262,11 @@ const NumberGame = () => {
                 </figure>
                 <div className="md:w-3/5 md:basis-auto lg:w-1/5">
                   <div className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 rounded-2lg border bg-white p-12">
+                    <p className="mb-3 font-semibold">Minimum Bet: {joinedMinimumBets}</p>
                     <p className="mb-3 font-semibold">Display Guessed number</p>
                     <p className="mb-3 font-semibold">Display number of bets</p>
+                    <p className="mb-3 font-semibold">Player 1: {joinedPlayerAddress[0]}</p>
+                    <p className="mb-3 font-semibold">Player 2: {joinedPlayerAddress[1]}</p>
                   </div>
                 </div>
               </div>

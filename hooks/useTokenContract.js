@@ -6,6 +6,7 @@ import BEP20_ABI from "../data/abi/bep20.json";
 import UniFactoryABI from "../data/abi/uniswapFactory.json";
 import UniPairABI from "../data/abi/uniswapPair.json";
 import { ethers } from "ethers";
+import { toast } from 'react-toastify';
 import {
 	etherRouterContractV2, etherFactoryContractV2, binanceTestFactoryContractV2, binanceTestRouterContractV2, binanceFactoryContractV2, binanceRouterContractV2
 } from "../config/setting";
@@ -17,7 +18,7 @@ export async function getTokenApproval(signer, tokenAddress, provider) {
 	try {
 		await contract.approve(contractAddress.routerAddress, spenderBalance);
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 }
 
@@ -30,7 +31,7 @@ export async function getUserTokenBalance(userAddress, tokenAddress, provider) {
 		userBalance = Math.ceil(userBalance.toString())
 		return userBalance.toString()
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 }
 
@@ -42,7 +43,7 @@ export async function getTokenAllowance(userAddress, tokenAddress, provider) {
 		userTokenAllowance = ethers.utils.formatEther(userTokenAllowance);
 		return userTokenAllowance
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 }
 
@@ -53,7 +54,7 @@ export async function getTokenSymbol(tokenAddress, provider) {
 		const tokenSymbol = await contract.symbol();
 		return tokenSymbol
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 }
 
@@ -64,7 +65,7 @@ export async function getTokenDecimal(tokenAddress, provider) {
 		const tokenDecimal = await contract.decimals();
 		return tokenDecimal
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 }
 
@@ -108,7 +109,7 @@ export async function getTokenPairApproval(tokenAddress1, tokenAddress2, provide
 	try {
 		await pairContract.approve(contractAddress.routerAddress, spenderBalance);
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 }
 
@@ -122,7 +123,7 @@ export async function getTokenPairAllowance(tokenAddress1, tokenAddress2, provid
 		userTokenAllowance = ethers.utils.formatEther(userTokenAllowance);
 		return userTokenAllowance
 	} catch (error) {
-		console.log(error);
+		toast.error(error);
 	}
 }
 
@@ -130,41 +131,46 @@ async function blockChainServer(provider) {
 	let routerAddress = "";
 	let factoryAddress = "";
 	let tokenABI = ERC20_ABI;
-	const network = await provider.getNetwork();
-	const chainID = network.chainId;
-	switch (chainID) {
-		case 1: // Etheruem net
-			routerAddress = etherRouterContractV2;
-			factoryAddress = etherFactoryContractV2;
-			tokenABI = ERC20_ABI;
-			break;
-
-		case 5: // goerli net
-			routerAddress = etherRouterContractV2;
-			factoryAddress = etherFactoryContractV2;
-			tokenABI = ERC20_ABI;
-			break;
-
-		case 56: // Binance net
-			routerAddress = binanceRouterContractV2;
-			factoryAddress = binanceFactoryContractV2;
-			tokenABI = BEP20_ABI;
-			break;
-
-		case 97: //Binance Testnet
-			routerAddress = binanceTestRouterContractV2;
-			factoryAddress = binanceTestFactoryContractV2;
-			tokenABI = BEP20_ABI;
-			break;
-
-		default:
-			console.warn("Unsupported network");
-			return;
+	try{
+		const network = await provider.getNetwork();
+		const chainID = network.chainId;
+		switch (chainID) {
+			case 1: // Etheruem net
+				routerAddress = etherRouterContractV2;
+				factoryAddress = etherFactoryContractV2;
+				tokenABI = ERC20_ABI;
+				break;
+	
+			case 5: // goerli net
+				routerAddress = etherRouterContractV2;
+				factoryAddress = etherFactoryContractV2;
+				tokenABI = ERC20_ABI;
+				break;
+	
+			case 56: // Binance net
+				routerAddress = binanceRouterContractV2;
+				factoryAddress = binanceFactoryContractV2;
+				tokenABI = BEP20_ABI;
+				break;
+	
+			case 97: //Binance Testnet
+				routerAddress = binanceTestRouterContractV2;
+				factoryAddress = binanceTestFactoryContractV2;
+				tokenABI = BEP20_ABI;
+				break;
+	
+			default:
+				console.warn("Unsupported network");
+				return;
+		}
+	
+		return {
+			routerAddress: routerAddress,
+			factoryAddress: factoryAddress,
+			tokenABI: tokenABI
+		}
+	}catch(error){
+		toast.error(error);
 	}
 
-	return {
-		routerAddress: routerAddress,
-		factoryAddress: factoryAddress,
-		tokenABI: tokenABI
-	}
 }
