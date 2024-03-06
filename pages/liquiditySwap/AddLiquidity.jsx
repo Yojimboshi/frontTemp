@@ -37,8 +37,6 @@ const LiquidityPool = () => {
     const tokensByChainId = useSelector((state) => state.user.tokens);
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
-            console.log("useEffect #1 running...")
-            console.log(tokenReserve);
             setupLiquidityPool({
                 tokenAddress1,
                 tokenAddress2,
@@ -57,14 +55,11 @@ const LiquidityPool = () => {
             });
             getChainId();
         }, 1000);
-        console.log(tokenPairAvailable)
         return () => clearTimeout(debounceTimer);  // Clear the timer on component unmount
     }, [tokenAddress1, tokenAddress2, tokenAmount1, tokenAmount2]);
 
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
-            console.log("useEffect #2 running...")
-            console.log(tokenAddress1, tokenAddress2, tokenReserve)
             if (
                 utils.isAddress(tokenAddress1) &&
                 utils.isAddress(tokenAddress2) &&
@@ -91,7 +86,12 @@ const LiquidityPool = () => {
         if (!isNaN(parseFloat(tokenAmount1)) && !isNaN(parseFloat(tokenQuote2))) {
             useAddLiquidity(tokenAddress1, tokenAddress2, tokenAmount1, tokenQuote2, defaultAccount, provider, tokenReserve);
         } else {
-            toast.error("One or both token amounts are not valid numbers.");
+            if (error.code === "ACTION_REJECTED") {
+                // User canceled or rejected the transaction
+                toast.error("Transaction canceled");
+              } else {
+                toast.error("One or both token amounts are not valid numbers.");
+              }
         }
     }
 
@@ -119,7 +119,7 @@ const LiquidityPool = () => {
             setTokenSymbol1(token1Symbol)
             setTokenSymbol2(token2Symbol)
         } catch (error) {
-            console.log(error)
+            toast.error(error);
         }
     }
 
@@ -130,7 +130,7 @@ const LiquidityPool = () => {
             setToken1Balance(t1balance)
             setToken2Balance(t2balance)
         } catch (error) {
-            console.log(error)
+            toast.error(error);
         }
     }
 

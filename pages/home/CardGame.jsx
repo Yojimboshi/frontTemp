@@ -3,10 +3,11 @@ import "tippy.js/dist/tippy.css";
 import Meta from "../../components/Meta";
 import Image from "next/image";
 import { useWallet } from '../../context/walletContext';
-import useNumberofRisk from '../../components/numbergame/NumberofRisk';
+import useNumberofRisk from '../../components/numbergame/CardGameOfRisks';
 import txUpdateDisplay from '../../utils/txUpdateDisplay';
 import { ethers } from 'ethers';
-import Card from './card';
+import { toast } from 'react-toastify';
+import Card from '../../components/numbergame/card';
 const NumberGame2 = () => {
   const { account, balance } = useWallet();
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
@@ -56,15 +57,18 @@ const NumberGame2 = () => {
       await txUpdateDisplay(transactionPromise, provider, account);
       // Maybe provide some success feedback here
     } catch (error) {
-      console.error(error);
-      // Display this error to the user
+      if (error.code === "ACTION_REJECTED") {
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("Error occured");
+      }
     }
   };
 
 
   const handleCreateGame = async () => {
     if (!createGame) {
-      console.error("createGame function is not initialized yet.");
+      toast.error("createGame function is not initialized yet.");
       return;
     }
     try {
@@ -76,8 +80,14 @@ const NumberGame2 = () => {
       await txUpdateDisplay(transactionPromise, provider, account);
       // Maybe provide some success feedback here
     } catch (error) {
-      console.error(error);
-      // Display this error to the user
+      if (error.code === "ACTION_REJECTED") {
+        // User canceled or rejected the transaction
+        setFlipped(false);
+        toast.error("Transaction canceled");
+      } else {
+        toast.error("Contract out of Ethers/ Bet does not reach the minimum requirement");
+      }
+
     }
   };
 
@@ -95,7 +105,6 @@ const NumberGame2 = () => {
 
   const handleOpenReward = () => {
     setOpenReward(!openReward);
-    console.log(cardsData);
   };
 
   return (
@@ -131,7 +140,7 @@ const NumberGame2 = () => {
                 value={createEntryBet}
                 onChange={(e) => setCreateEntryBet(e.target.value)}
                 className="border border-solid dark:border-jacarta-600 border-gray-300 mb-2 rounded-full py-2 px-4 w-full m-2"
-                placeholder="Enter your Entry Bet here"
+                placeholder="Entry Bet"
               />
             </div>
           </div>
@@ -143,11 +152,12 @@ const NumberGame2 = () => {
               onClick={handleOpenReward}
             >See Reward
             </button>
-            <div class="m-2">
-              <h1 class="mb-2">Games that you have joined</h1>
+            <div className="m-2">
+              <h1 className="mb-2">Games that you have joined</h1>
               <select className='text-jacarta-700 placeholder-jacarta-500 focus:ring-accent border-jacarta-100 w-60 rounded-2xl border py-[0.6875rem] px-4 dark:border-transparent dark:bg-white/[.15] dark:text-white dark:placeholder-white'
+                defaultValue=""
                 onChange={handlePlayerJoinedGameOption}>
-                <option disabled selected value="">GamesIds that you joined</option>
+                <option disabled value="">GamesIds that you joined</option>
                 {playerJoinedGame.map((number, index) => (
                   <option key={index} value={number}>
                     {number}

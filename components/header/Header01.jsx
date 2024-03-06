@@ -71,7 +71,7 @@ export default function Header01() {
         id: uuidv4(),
         name: "NumberGameTab",
         condition: true,
-        path: "/home/numberGamesTab",
+        path: "/Tabs/numberGamesTab",
       },
       {
         id: uuidv4(),
@@ -90,7 +90,7 @@ export default function Header01() {
         id: uuidv4(),
         name: "LiquiditySwap",
         condition: true,
-        path: "/home/liquiditySwap",
+        path: "/Tabs/liquiditySwap",
       },
 
     ],

@@ -25,7 +25,7 @@ export default function useNumberofRisk() {
     }, [account]);
 
     const withdraw = (gameid) => {
-        return contract.withdraw(gameid, { gasLimit: 100000 });
+        return contract.Withdraw(gameid, { gasLimit: 100000 });
     };
 
     const playGame = (gameid) => {
